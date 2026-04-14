@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airbridge 제안서 생성기</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #1356FF;
+    --blue-light: #EEF2FF;
+    --blue-mid: #C7D7FE;
+    --dark: #0F172A;
+    --gray: #64748B;
+    --border: #E2E8F0;
+    --bg: #F8FAFC;
+    --white: #fff;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 48px 24px 80px; }
+  .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+  .logo-mark { width: 36px; height: 36px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px; }
+  .logo-text { font-size: 18px; font-weight: 700; color: var(--dark); }
+  .hero { margin-bottom: 40px; }
+  .hero h1 { font-size: 28px; font-weight: 800; line-height: 1.3; margin-bottom: 8px; }
+  .hero p { color: var(--gray); font-size: 15px; line-height: 1.6; }
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+  .card h2 { font-size: 13px; font-weight: 700; color: var(--blue); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 20px; }
+  .field { margin-bottom: 20px; }
+  .field:last-child { margin-bottom: 0; }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+  label .req { color: var(--blue); margin-left: 2px; }
+  input[type=text] { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--dark); background: var(--white); transition: border-color .15s; outline: none; }
+  input[type=text]:focus { border-color: var(--blue); }
+  select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--dark); background: var(--white); outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  select:focus { border-color: var(--blue); }
+  .radio-group { display: flex; gap: 8px; }
+  .radio-group label { cursor: pointer; }
+  .radio-btn { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .15s; user-select: none; background: var(--white); }
+  .radio-btn:hover { border-color: var(--blue-mid); background: var(--blue-light); }
+  .radio-btn.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue); font-weight: 600; }
+  .radio-btn input { display: none; }
+  .sub-field { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); display: none; }
+  .sub-field.show { display: block; }
+  .mau-table { background: var(--blue-light); border-radius: 8px; padding: 12px 16px; margin-top: 10px; font-size: 13px; }
+  .mau-table-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--blue-mid); }
+  .mau-table-row:last-child { border-bottom: none; }
+  .mau-table-row .range { color: var(--gray); }
+  .mau-table-row .price { font-weight: 700; color: var(--dark); }
+  .btn-generate { width: 100%; padding: 16px; background: var(--blue); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background .15s, transform .1s; letter-spacing: -0.01em; }
+  .btn-generate:hover { background: #0A47E8; }
+  .btn-generate:active { transform: scale(0.99); }
+  .footer-note { text-align: center; font-size: 12px; color: var(--gray); margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-mark">A</div>
+    <div class="logo-text">Airbridge</div>
+  </div>
+
+  <div class="hero">
+    <h1>에어브릿지 제안서를<br>대신 제작해드립니다</h1>
+    <p>광고주 정보를 입력하면 버티컬 맞춤 사례자료와<br>경쟁사 비교가 포함된 제안서를 즉시 생성합니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>광고주 정보</h2>
+    <div class="field">
+      <label>광고주명 <span class="req">*</span></label>
+      <input type="text" id="clientName" placeholder="예: 00커머스" />
+    </div>
+    <div class="field">
+      <label>에이전시명</label>
+      <input type="text" id="agencyName" placeholder="예: 00에이전시" />
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>서비스 정보</h2>
+    <div class="field">
+      <label>버티컬 <span class="req">*</span></label>
+      <select id="vertical">
+        <option value="">선택해주세요</option>
+        <option value="게임">게임</option>
+        <option value="엔터테인먼트">엔터테인먼트</option>
+        <option value="금융/핀테크">금융/핀테크</option>
+        <option value="패션/커머스">패션/커머스</option>
+        <option value="라이프스타일">라이프스타일</option>
+        <option value="비즈니스서비스">비즈니스서비스</option>
+        <option value="모빌리티">모빌리티</option>
+        <option value="리테일">리테일</option>
+        <option value="보험">보험</option>
+        <option value="뷰티/의료">뷰티/의료</option>
+        <option value="헬스케어/스포츠">헬스케어/스포츠</option>
+        <option value="여행">여행</option>
+        <option value="광고">광고</option>
+        <option value="농업/애그테크">농업/애그테크</option>
+        <option value="Pet(반려동물)">Pet(반려동물)</option>
+        <option value="소셜/데이팅">소셜/데이팅</option>
+        <option value="부동산">부동산</option>
+        <option value="교육">교육</option>
+        <option value="유틸리티">유틸리티</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>MAU 규모 <span class="req">*</span></label>
+      <div class="radio-group" id="mauGroup">
+        <label><div class="radio-btn" data-val="0-5만"><input type="radio" name="mau" value="0-5만">0 – 5만</div></label>
+        <label><div class="radio-btn" data-val="5-10만"><input type="radio" name="mau" value="5-10만">5 – 10만</div></label>
+        <label><div class="radio-btn" data-val="10만+"><input type="radio" name="mau" value="10만+">10만 이상</div></label>
+      </div>
+      <div class="mau-table" style="margin-top:12px">
+        <div class="mau-table-row"><span class="range">0 – 5만 MAU</span><span class="price">연 1,200만원</span></div>
+        <div class="mau-table-row"><span class="range">5 – 10만 MAU</span><span class="price">연 1,920만원</span></div>
+        <div class="mau-table-row"><span class="range">10만 MAU 이상</span><span class="price">별도 협의</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>도입 유형</h2>
+    <div class="field">
+      <label>신규 도입 또는 이관 여부 <span class="req">*</span></label>
+      <div class="radio-group" id="typeGroup">
+        <label><div class="radio-btn" data-val="신규"><input type="radio" name="type" value="신규">신규 도입</div></label>
+        <label><div class="radio-btn" data-val="이관"><input type="radio" name="type" value="이관">타 MMP 이관</div></label>
+      </div>
+      <div class="sub-field" id="mmpField">
+        <label>현재 사용 중인 MMP</label>
+        <select id="currentMMP">
+          <option value="">선택해주세요</option>
+          <option value="AppsFlyer">AppsFlyer</option>
+          <option value="Adjust">Adjust</option>
+          <option value="Dfinery">Dfinery (애드브릭스)</option>
+          <option value="기타">기타 MMP</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-generate" onclick="generate()">제안서 생성 & 다운로드</button>
+  <p class="footer-note">생성된 제안서는 브라우저에서 바로 열리며, 인쇄(Ctrl+P) 시 PDF로 저장할 수 있습니다.</p>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// DATA
+// ──────────────────────────────────────────────
+const CASE_STUDIES = {
+  '게임': [
+    { co:'라이온하트스튜디오', goal:'유저 행동 분석', result:'유저 온보딩 최적화·이탈 구간 파악', url:'https://cshub.ab180.co/ko/case-studies/airbridge-funnelreport-lionheartstudio' },
+    { co:'퍼스트 디센던트', goal:'크로스플랫폼 성과 측정', result:'PC·콘솔 광고 성과 측정·최적화', url:'https://www.airbridge.io/ko/case-studies/first-descendant-pc-console' },
+    { co:'후야호 (탕후루의 달인)', goal:'데이터 마케팅 전략', result:'출시 일주일 만에 인기 차트 1위', url:'https://www.airbridge.io/ko/case-studies/whoyaho-game-data-marketing-strategy' },
+    { co:'뮤 모나크', goal:'크리에이티브 최적화', result:'로그인율 90% 이상 개선', url:'https://www.airbridge.io/ko/case-studies/mu-monarch-creative-optimization' },
+  ],
+  '엔터테인먼트': [
+    { co:'파라닷', goal:'전환 분석', result:'리퍼럴 유저 전환 성과 분석', url:'https://cshub.ab180.co/ko/case-studies/airbridge-trackinglink-paradot' },
+  ],
+  '금융/핀테크': [
+    { co:'현대카드', goal:'광고비 최적화', result:'AI 기반 예산 최적화로 신규 카드 발급 16% 증가', url:'https://www.airbridge.io/ko/case-studies/hyundai-card-ad-spend-optimization' },
+    { co:'시그널플래너', goal:'데이터 통합', result:'캠페인·CRM·분석 흐름 고도화', url:'https://www.airbridge.io/ko/case-studies/signalplanner-integrated-data-pipeline' },
+  ],
+  '패션/커머스': [
+    { co:'퀸잇', goal:'데이터 파이프라인', result:'총거래액 연간 1700% 성장', url:'https://www.airbridge.io/ko/case-studies/queenit-data-pipleline-analytics' },
+    { co:'Meliz', goal:'프라이버시 중심 측정', result:'MMM 도입으로 지속 성장', url:'https://www.airbridge.io/ko/case-studies/meliz-privacy-first-mmm' },
+  ],
+  '라이프스타일': [
+    { co:'나이틀리', goal:'성과 최적화', result:'CPA 18% 절감, 일본 앱스토어 Top 3 진입', url:'https://www.airbridge.io/ko/case-studies/nightly-ios-performance-measurement' },
+    { co:'모니모니', goal:'성과 최적화', result:'CPI 성과 10배 개선', url:'https://cshub.ab180.co/ko/case-studies/airbridge-monymony-report' },
+    { co:'알라미(Delight Room)', goal:'ROAS 개선', result:'글로벌 1위 알람 앱 ROAS 개선', url:'https://www.airbridge.io/ko/case-studies/alarmy-roas-measurement' },
+    { co:'슈무디', goal:'크로스플랫폼 분석', result:'앱 다운로드 100만+ 달성', url:'https://www.airbridge.io/ko/case-studies/shmoody-cross-platform-tracking' },
+  ],
+  '비즈니스서비스': [
+    { co:'원티드랩', goal:'웹투앱 전환', result:'CPA 38% 절감', url:'https://www.airbridge.io/ko/case-studies/wantedlab-web-to-app-attribution' },
+    { co:'삼쩜삼', goal:'성과 최적화', result:'앱 다운로드 778만, CPI 최적화', url:'https://www.airbridge.io/ko/case-studies/3o3-web-to-app-conversion-tracking' },
+    { co:'뤼튼', goal:'ROAS 최적화', result:'잔존 성과 분석으로 매체 효율화', url:'https://cshub.ab180.co/ko/case-studies/airbridge-retention-cohort-metric-wrtn' },
+  ],
+  '뷰티/의료': [
+    { co:'강남언니', goal:'리타게팅', result:'CAC 51.8% 감소', url:'https://www.airbridge.io/ko/case-studies/gangnamunni-skan-titok-retargeting' },
+  ],
+  '헬스케어/스포츠': [
+    { co:'닥터나우', goal:'웹투앱 전환', result:'웹사이트→앱 전환 성과 분석', url:'https://cshub.ab180.co/ko/case-studies/airbridge-setdeeplinks-doctornow' },
+  ],
+  '여행': [
+    { co:'고투조이', goal:'광고사기 방지', result:'제휴마케팅 광고사기 90% 감소', url:'https://www.airbridge.io/ko/case-studies/go2joy-fraud-prevention-detection' },
+    { co:'WAUG', goal:'웹투앱 전환', result:'웹투앱 전환율 향상', url:'https://cshub.ab180.co/ko/case-studies/airbridge-braze-webtoapp-waug' },
+  ],
+  '광고': [
+    { co:'플레이오', goal:'리텐션 분석', result:'30일 리텐션 30% 달성', url:'https://www.airbridge.io/ko/case-studies/playo-d30-retention-cpa-optimization' },
+  ],
+  '농업/애그테크': [
+    { co:'그린랩스', goal:'CRM 성과 분석', result:'중장기적 CRM 전환 성과 분석', url:'https://cshub.ab180.co/ko/case-studies/airbridge-braze-crm-anlaytics' },
+  ],
+  'Pet(반려동물)': [
+    { co:'Bite Me', goal:'오가닉 분석', result:'오가닉 유입 키워드 발굴', url:'https://cshub.ab180.co/ko/case-studies/airbridge-biteme-organic-referrer-attribution' },
+  ],
+  '소셜/데이팅': [
+    { co:'Bleet', goal:'딥링크 & UA 성장', result:'가입 프로모션 성과 10배 개선', url:'https://www.airbridge.io/ko/case-studies/bleet-deep-linking-ua-growth' },
+  ],
+  '부동산': [
+    { co:'다방', goal:'딥링크 최적화', result:'딥링크 제작 리소스 90% 절감', url:'https://www.airbridge.io/ko/case-studies/dabang-deeplink' },
+  ],
+};
+
+const MIGRATION = {
+  '게임': ['컴투스','카카오게임즈','라이온하트스튜디오','이스트게임즈','조이시티','플레이위드','엔젤게임즈','나딕게임즈','파우게임즈','에피드게임즈','그램퍼스','썸에이지','스탠드에그','피벗게임즈','밸로프','하이브로'],
+  '엔터테인먼트': ['위버스컴퍼니','예스24','리디','지니뮤직','뉴닉','밀리의서재','콘텐츠랩블루','워프스페이스','픽소','타파스엔터테인먼트'],
+  '금융/핀테크': ['핀다','KB국민은행','BC카드','SBI저축은행','KB핀테크','센트비','트래블월렛','SSG닷컴'],
+  '패션/커머스': ['더블유컨셉','신성통상','머스트잇','트렌비','마인이스','이마트','백패커','호텔신라'],
+  '라이프스타일': ['의식주컴퍼니','솜씨당','세탁특공대','폴센트','엘지유플러스','조이토이'],
+  '모빌리티': ['쏘카','티맵모빌리티','타다','붕붕마켓'],
+  '리테일': ['한샘','이랜드월드','텐바이텐','카닥','데일리샷'],
+  '보험': ['삼성화재','삼성생명','해빗팩토리'],
+  'F&B': ['위대한상상(요기요)','와드(캐치테이블)'],
+  '뷰티/의료': ['블리몽키즈','바비톡'],
+  '헬스케어/스포츠': ['김캐디','카카오브이엑스'],
+  '비즈니스서비스': ['미디어윌','리멤버앤컴퍼니','크몽','브레인커머스','어글리랩'],
+  '유틸리티': ['액션파워','루티너리','허슬러즈'],
+  '여행': ['엑스트라이버'],
+  '교육': ['그로비랩스'],
+};
+
+const COMPARISON = {
+  'AppsFlyer': [
+    ['Raw data 추출','기본 포함 (CSV·API·S3)','Add-on 필요'],
+    ['광고사기 방지','기본 포함','Add-on 필요 (Protect360)'],
+    ['네이버·카카오 키워드 연동','MMP 중 유일 지원','미지원'],
+    ['가격 책정','MAU 기반 (예측 가능)','설치 수 기반 (급증 시 비용 폭등)'],
+    ['웹투앱 트래킹','완전 지원','Smart Banner 기능만'],
+    ['한국어 지원','전담 한국 CS','미지원'],
+    ['대시보드 자유도','메트릭 40개, GroupBy 10개','메트릭 25개, GroupBy 1개'],
+    ['통합 대시보드','iOS·Android·SKAdNetwork·웹 통합','각각 분리 제공'],
+  ],
+  'Adjust': [
+    ['국내 검색광고 키워드','네이버·카카오 실시간 지원','미지원'],
+    ['웹투앱 트래킹','완전 지원','정적·파편화된 기능'],
+    ['Predictive LTV','전체 제공','SKAdNetwork 한정'],
+    ['대시보드 자유도','메트릭 40개, GroupBy 10개','메트릭 25개, GroupBy 6개'],
+    ['가격 책정','MAU 기반 (예측 가능)','전환 수 기반 (급증 시 비용 폭등)'],
+    ['UTM 파라미터 자동 분석','지원','미지원'],
+    ['SKAdNetwork 중복기여 판별','지원','미지원'],
+    ['한국어 지원','전담 한국 CS','미지원'],
+  ],
+  'Dfinery': [
+    ['SAN 공식 연동','Google·Meta·ASA 공식 파트너','비공식 방식 → 계정 정지 리스크'],
+    ['기여 분석 객관성','고정 로직 → 일관된 결과','광고주 설정에 따라 결과 변동'],
+    ['클릭/노출 로그 수집','지원 (View-through 포함)','불가 → UTM 기반만 사용'],
+    ['광고 최적화','매체 알고리즘 연동','최적화 제약'],
+    ['데이터 중립성','고객 동의 없이 공유 불가','3rd party DMP 활용 가능'],
+  ],
+};
+
+// ──────────────────────────────────────────────
+// UI INTERACTIONS
+// ──────────────────────────────────────────────
+document.querySelectorAll('.radio-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const name = this.querySelector('input').name;
+    document.querySelectorAll(`.radio-btn`).forEach(b => {
+      if(b.querySelector('input') && b.querySelector('input').name === name) b.classList.remove('active');
+    });
+    this.classList.add('active');
+    this.querySelector('input').checked = true;
+    if(name === 'type') {
+      document.getElementById('mmpField').classList.toggle('show', this.dataset.val === '이관');
+    }
+  });
+});
+
+// ──────────────────────────────────────────────
+// GENERATOR
+// ──────────────────────────────────────────────
+function generate() {
+  const clientName = document.getElementById('clientName').value.trim();
+  const agencyName = document.getElementById('agencyName').value.trim();
+  const vertical = document.getElementById('vertical').value;
+  const mau = document.querySelector('input[name="mau"]:checked')?.value;
+  const type = document.querySelector('input[name="type"]:checked')?.value;
+  const currentMMP = document.getElementById('currentMMP').value;
+
+  if(!clientName){ alert('광고주명을 입력해주세요.'); return; }
+  if(!vertical){ alert('버티컬을 선택해주세요.'); return; }
+  if(!mau){ alert('MAU 규모를 선택해주세요.'); return; }
+  if(!type){ alert('도입 유형을 선택해주세요.'); return; }
+
+  const mauPrice = mau === '0-5만' ? '연 1,200만원' : mau === '5-10만' ? '연 1,920만원' : '별도 협의 필요';
+  const cases = CASE_STUDIES[vertical] || [];
+  const migratedList = MIGRATION[vertical] || MIGRATION[vertical] || [];
+  const compRows = (type === '이관' && currentMMP && COMPARISON[currentMMP]) ? COMPARISON[currentMMP] : null;
+
+  // normalize vertical for migration lookup
+  let migLookup = vertical;
+  if(vertical === '패션/커머스') migLookup = '패션/커머스';
+
+  const html = buildProposal({ clientName, agencyName, vertical, mau, mauPrice, type, currentMMP, cases, migratedList, compRows });
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `에어브릿지_제안서_${clientName}.html`;
+  a.click();
+}
+
+function buildProposal({ clientName, agencyName, vertical, mau, mauPrice, type, currentMMP, cases, migratedList, compRows }) {
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+
+  // Slide 1 content
+  const slide1Content = type === '이관' ? `
+    <h3 class="case-badge case-b">CASE B — 타 MMP 이관 검토</h3>
+    <div class="pain-list">
+      ${currentMMP === 'AppsFlyer' ? `
+      <div class="pain-item">📊 <strong>Fraud·Raw data·Organic 데이터 모두 Add-on</strong> — 기본 기능에 별도 비용 발생</div>
+      <div class="pain-item">🔍 <strong>네이버·카카오 검색광고 비용 연동 불가</strong> — 국내 주요 매체 ROAS 파악 어려움</div>
+      <div class="pain-item">🌐 <strong>해외 서버 데이터 저장</strong> — 개인정보보호법·ISMS 리스크</div>
+      <div class="pain-item">💸 <strong>설치(Install) 기반 과금</strong> — 캠페인 성과 좋을수록 비용 예측 불가</div>
+      <div class="pain-item">🇰🇷 <strong>한국어 지원 부재</strong> — 이슈 발생 시 대응 속도 저하</div>
+      ` : currentMMP === 'Adjust' ? `
+      <div class="pain-item">🔍 <strong>네이버·카카오 검색광고 키워드 데이터 미지원</strong></div>
+      <div class="pain-item">📊 <strong>Predictive LTV는 SKAdNetwork 한정만 지원</strong></div>
+      <div class="pain-item">🔗 <strong>웹투앱 트래킹이 정적·파편화</strong> — 웹 유입 → 앱 전환 여정 분석 어려움</div>
+      <div class="pain-item">💸 <strong>전환 수 기반 과금</strong> — 캠페인 증가 시 비용 예측 불가</div>
+      <div class="pain-item">🇰🇷 <strong>한국어 지원 부재</strong> — 이슈 대응 속도 저하</div>
+      ` : currentMMP === 'Dfinery' ? `
+      <div class="pain-item">⚠️ <strong>Meta·Google 비공식 추적</strong> — 광고 계정 정지·폐쇄 리스크</div>
+      <div class="pain-item">📊 <strong>기여 분석 결과가 설정에 따라 변동</strong> — 데이터 신뢰도 저하</div>
+      <div class="pain-item">🔍 <strong>View-through 측정 불가</strong> — UTM 기반 한계</div>
+      <div class="pain-item">🤖 <strong>매체 알고리즘 최적화 제약</strong> — 마케팅 예산 효율 저하</div>
+      ` : `
+      <div class="pain-item">🌐 <strong>해외 서버 데이터 저장</strong> — 개인정보보호법·ISMS 리스크</div>
+      <div class="pain-item">🔍 <strong>국내 매체 연동 한계</strong> — 네이버·카카오 키워드 데이터 미지원</div>
+      <div class="pain-item">💸 <strong>전환/설치 기반 과금</strong> — 예산 예측 어려움</div>
+      <div class="pain-item">🇰🇷 <strong>한국어 지원 부재</strong> — 이슈 대응 지연</div>
+      `}
+    </div>
+  ` : `
+    <h3 class="case-badge case-a">CASE A — MMP 신규 도입</h3>
+    <div class="pain-list">
+      <div class="pain-item">❓ <strong>어떤 매체가 실제 앱 설치·구매를 만드는지 알 수 없음</strong></div>
+      <div class="pain-item">📊 <strong>매체 리포트 합산 → 중복 기여·광고 사기 피해 가능</strong></div>
+      <div class="pain-item">🔗 <strong>앱 링크 클릭 후 앱이 열리지 않거나 처음부터 재시작되는 문제</strong></div>
+      <div class="pain-item">💸 <strong>ROAS 집계 불가 → 예산 배분 최적화 불가</strong></div>
+      <div class="pain-item">📱 <strong>웹 광고 → 앱 전환 여정 추적 불가</strong></div>
+    </div>
+  `;
+
+  // Slide 4 comparison table
+  const slide4Content = compRows ? `
+    <table class="comp-table">
+      <thead><tr><th>항목</th><th class="ab">Airbridge</th><th class="comp">${currentMMP}</th></tr></thead>
+      <tbody>
+        ${compRows.map(([item, ab, comp]) => `<tr><td>${item}</td><td class="ab-cell">${ab}</td><td class="comp-cell">${comp}</td></tr>`).join('')}
+      </tbody>
+    </table>
+    <p class="comp-link">→ <a href="https://www.airbridge.io/ko/compare/airbridge-vs-${currentMMP === 'AppsFlyer' ? 'appsflyer' : 'adjust'}" target="_blank">상세 비교 전체 보기</a></p>
+  ` : `
+    <div class="feature-grid">
+      <div class="feature-card"><div class="feature-icon">🇰🇷</div><div class="feature-label">한국 데이터 서버</div><div class="feature-desc">AWS 서울 리전 · ISMS 인증</div></div>
+      <div class="feature-card"><div class="feature-icon">🔗</div><div class="feature-label">국내 매체 단독 연동</div><div class="feature-desc">네이버·카카오·토스·당근 MMP 유일</div></div>
+      <div class="feature-card"><div class="feature-icon">💰</div><div class="feature-label">All-inclusive 가격</div><div class="feature-desc">Fraud·Raw data·오디언스 추가 비용 없음</div></div>
+      <div class="feature-card"><div class="feature-icon">📊</div><div class="feature-label">자유로운 대시보드</div><div class="feature-desc">메트릭 40개, GroupBy 10개</div></div>
+      <div class="feature-card"><div class="feature-icon">🧑‍💼</div><div class="feature-label">한국어 전담 지원</div><div class="feature-desc">시차 없는 빠른 이슈 대응</div></div>
+      <div class="feature-card"><div class="feature-icon">🤖</div><div class="feature-label">AI 예측 기능</div><div class="feature-desc">Predictive LTV · Predictive Lifetime</div></div>
+    </div>
+  `;
+
+  // Slide 5 case studies
+  const caseContent = cases.length > 0 ? `
+    <div class="case-grid">
+      ${cases.slice(0,4).map(c => `
+        <a href="${c.url}" target="_blank" class="case-card">
+          <div class="case-goal">${c.goal}</div>
+          <div class="case-company">${c.co}</div>
+          <div class="case-result">${c.result}</div>
+          <div class="case-link">자세히 보기 →</div>
+        </a>
+      `).join('')}
+    </div>
+  ` : `<p style="color:#64748B;font-size:14px">해당 버티컬 사례는 별도 문의 주시면 안내 드립니다.</p>`;
+
+  const migContent = migratedList.length > 0 ? `
+    <div class="mig-section">
+      <div class="mig-label">${vertical} 버티컬 — 에어브릿지 이관 고객사</div>
+      <div class="mig-chips">${migratedList.map(c => `<span class="chip">${c}</span>`).join('')}</div>
+    </div>
+  ` : '';
+
+  const mauNote = mau === '10만+' ? '별도 협의 필요 (영업 담당자 문의)' : mauPrice;
+
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airbridge 제안서 — ${clientName}</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --blue:#1356FF; --blue-light:#EEF2FF; --dark:#0F172A; --gray:#64748B; --border:#E2E8F0; }
+  html,body { height:100%; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Pretendard','Noto Sans KR',sans-serif; background:#fff; color:var(--dark); }
+
+  /* SLIDES */
+  .slides { position:relative; }
+  .slide { display:none; min-height:100vh; padding:60px; flex-direction:column; }
+  .slide.active { display:flex; }
+  @media(max-width:768px){ .slide{ padding:32px 20px; } }
+
+  /* HEADER BAR */
+  .slide-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:48px; }
+  .slide-logo { display:flex; align-items:center; gap:8px; }
+  .slide-logo-mark { width:28px;height:28px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px; }
+  .slide-logo-text { font-size:14px;font-weight:700; }
+  .slide-num { font-size:12px;color:var(--gray);font-weight:500; }
+
+  /* HERO */
+  .slide-body { flex:1; }
+  .slide-tag { display:inline-block;background:var(--blue-light);color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:4px;margin-bottom:16px; }
+  .slide-title { font-size:36px;font-weight:800;line-height:1.2;margin-bottom:16px; }
+  .slide-subtitle { font-size:16px;color:var(--gray);line-height:1.6;margin-bottom:40px; }
+  @media(max-width:768px){ .slide-title{ font-size:26px; } }
+
+  /* PAIN LIST */
+  .pain-list { display:flex;flex-direction:column;gap:14px;margin-top:24px; }
+  .pain-item { background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:16px 20px;font-size:15px;line-height:1.5; }
+  .case-badge { display:inline-flex;align-items:center;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:700;margin-bottom:24px; }
+  .case-a { background:#EFF6FF;color:#1D4ED8; }
+  .case-b { background:#FEF3C7;color:#92400E; }
+
+  /* WHY MMP TABLE */
+  .why-table { width:100%;border-collapse:collapse;margin-top:24px; }
+  .why-table th { background:var(--blue);color:#fff;padding:12px 16px;text-align:left;font-size:13px;font-weight:600; }
+  .why-table td { padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top; }
+  .why-table td:first-child { font-weight:600;color:var(--blue);width:200px; }
+  .why-table tr:last-child td { border-bottom:none; }
+
+  /* AB FEATURES */
+  .feature-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px; }
+  @media(max-width:768px){ .feature-grid{ grid-template-columns:repeat(2,1fr); } }
+  .feature-card { background:var(--blue-light);border:1px solid #C7D7FE;border-radius:12px;padding:20px;text-align:center; }
+  .feature-icon { font-size:24px;margin-bottom:8px; }
+  .feature-label { font-size:14px;font-weight:700;margin-bottom:4px; }
+  .feature-desc { font-size:12px;color:var(--gray); }
+
+  /* COMPARISON TABLE */
+  .comp-table { width:100%;border-collapse:collapse;margin-top:24px; }
+  .comp-table th { padding:12px 16px;text-align:left;font-size:13px;font-weight:600; }
+  .comp-table th.ab { background:var(--blue);color:#fff; }
+  .comp-table th.comp { background:#F1F5F9;color:var(--dark); }
+  .comp-table th:first-child { background:#0F172A;color:#fff;width:200px; }
+  .comp-table td { padding:11px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top; }
+  .comp-table td.ab-cell { background:#F0F7FF;color:#1D4ED8;font-weight:500; }
+  .comp-table td.comp-cell { background:#FFFBEB;color:#92400E; }
+  .comp-link { margin-top:16px;font-size:13px;color:var(--gray); }
+  .comp-link a { color:var(--blue);text-decoration:none;font-weight:600; }
+
+  /* CASE STUDIES */
+  .case-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px; }
+  @media(max-width:768px){ .case-grid{ grid-template-columns:1fr; } }
+  .case-card { background:#F8FAFC;border:1px solid var(--border);border-radius:12px;padding:20px;text-decoration:none;color:inherit;transition:border-color .15s; display:block; }
+  .case-card:hover { border-color:var(--blue); }
+  .case-goal { font-size:11px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px; }
+  .case-company { font-size:16px;font-weight:700;margin-bottom:8px; }
+  .case-result { font-size:14px;color:var(--gray);line-height:1.5;margin-bottom:12px; }
+  .case-link { font-size:12px;color:var(--blue);font-weight:600; }
+  .mig-section { margin-top:32px;padding-top:24px;border-top:1px solid var(--border); }
+  .mig-label { font-size:12px;font-weight:700;color:var(--gray);letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px; }
+  .mig-chips { display:flex;flex-wrap:wrap;gap:8px; }
+  .chip { background:var(--blue-light);color:var(--blue);font-size:12px;font-weight:500;padding:5px 12px;border-radius:100px;border:1px solid #C7D7FE; }
+
+  /* PROCESS */
+  .process-steps { display:flex;flex-direction:column;gap:12px;margin:24px 0; }
+  .step { display:flex;align-items:flex-start;gap:16px;background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:16px 20px; }
+  .step-num { min-width:32px;height:32px;background:var(--blue);color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px; }
+  .step-content { flex:1; }
+  .step-title { font-size:15px;font-weight:700;margin-bottom:4px; }
+  .step-desc { font-size:13px;color:var(--gray); }
+  .step-period { font-size:12px;color:var(--blue);font-weight:600;margin-top:4px; }
+  .price-box { background:var(--blue);color:#fff;border-radius:12px;padding:24px;margin-top:24px; }
+  .price-box-title { font-size:13px;font-weight:600;opacity:.8;margin-bottom:12px; }
+  .price-box-value { font-size:32px;font-weight:800;margin-bottom:4px; }
+  .price-box-note { font-size:13px;opacity:.8; }
+
+  /* CONTACT */
+  .contact-card { background:var(--blue-light);border:1px solid #C7D7FE;border-radius:16px;padding:32px;margin-top:24px; }
+  .contact-label { font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px; }
+  .contact-name { font-size:20px;font-weight:800;margin-bottom:4px; }
+  .contact-info { font-size:15px;color:var(--gray); }
+  .contact-badge { display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;margin-left:8px;vertical-align:middle; }
+
+  /* NAVIGATION */
+  .nav-bar { position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:16px 60px;display:flex;align-items:center;justify-content:space-between;z-index:100; }
+  @media(max-width:768px){ .nav-bar{ padding:12px 20px; } }
+  .nav-btn { padding:10px 24px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--dark); }
+  .nav-btn:hover { border-color:var(--blue);color:var(--blue); }
+  .nav-btn.primary { background:var(--blue);border-color:var(--blue);color:#fff; }
+  .nav-btn.primary:hover { background:#0A47E8; }
+  .nav-progress { display:flex;align-items:center;gap:6px; }
+  .nav-dot { width:6px;height:6px;border-radius:50%;background:var(--border);cursor:pointer;transition:background .15s; }
+  .nav-dot.active { background:var(--blue);width:20px;border-radius:3px; }
+
+  /* PRINT */
+  @media print {
+    .nav-bar { display:none; }
+    .slide { display:flex!important; page-break-after:always; min-height:100vh; }
+    .slide:last-child { page-break-after:auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1 -->
+<div class="slide active" id="slide-1">
+  <div class="slide-header">
+    <div class="slide-logo"><div class="slide-logo-mark">A</div><div class="slide-logo-text">Airbridge</div></div>
+    <div class="slide-num">1 / 7</div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-tag">광고주 현황 진단</div>
+    <h1 class="slide-title">${clientName}의 현재<br>광고 성과 측정 환경</h1>
+    ${slide1Content}
+  </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" id="slide-2">
+  <div class="slide-header">
+    <div class="slide-logo"><div class="slide-logo-mark">A</div><div class="slide-logo-text">Airbridge</div></div>
+    <div class="slide-num">2 / 7</div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-tag">Why MMP</div>
+    <h1 class="slide-title">왜 MMP가 필요한가</h1>
+    <p class="slide-subtitle">MMP는 광고 매체별 앱 성과를 중립적으로 측정해<br>전환에 기여한 매체를 정확히 식별합니다.</p>
+    <table class="why-table">
+      <thead><tr><th>문제</th><th>MMP 도입 후</th></tr></thead>
+      <tbody>
+        <tr><td>성과 측정 표준화</td><td>채널별 전환 기준을 하나의 기준으로 통합해 정확한 비교 가능</td></tr>
+        <tr><td>유저 여정 단절</td><td>웹→앱→PC 딥링크로 끊김 없는 여정 및 어트리뷰션 제공</td></tr>
+        <tr><td>광고 사기 예산 낭비</td><td>클릭 위조·중복 기여 자동 필터링으로 예산 최적화</td></tr>
+        <tr><td>리타게팅 비효율</td><td>이벤트 기준 타겟 세그먼트 자동 생성 → 매체 자동 연동</td></tr>
+        <tr><td>매체별 SDK 설치 부담</td><td>Airbridge SDK 1회 설치로 350개+ 매체 성과 측정</td></tr>
+        <tr><td>포스트백 미비</td><td>매체가 수집 못하는 인앱 이벤트를 전송해 광고 최적화 지원</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" id="slide-3">
+  <div class="slide-header">
+    <div class="slide-logo"><div class="slide-logo-mark">A</div><div class="slide-logo-text">Airbridge</div></div>
+    <div class="slide-num">3 / 7</div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-tag">에어브릿지란?</div>
+    <h1 class="slide-title">한국 시장에 특화된<br>MMP, Airbridge</h1>
+    <p class="slide-subtitle">가장 늦게 시작해 가장 빠르게 성장한 MMP — ARR CAGR +47.7%, 고객사 수 CAGR +75.4%</p>
+    <div class="feature-grid">
+      <div class="feature-card"><div class="feature-icon">🇰🇷</div><div class="feature-label">한국 데이터 서버</div><div class="feature-desc">AWS 서울 리전 · ISMS 인증</div></div>
+      <div class="feature-card"><div class="feature-icon">🔗</div><div class="feature-label">국내 매체 단독 연동</div><div class="feature-desc">네이버·카카오·토스·당근 비용 연동 MMP 유일</div></div>
+      <div class="feature-card"><div class="feature-icon">💰</div><div class="feature-label">All-inclusive 요금제</div><div class="feature-desc">Fraud·Raw data·오디언스 추가 비용 없음</div></div>
+      <div class="feature-card"><div class="feature-icon">📊</div><div class="feature-label">자유로운 대시보드</div><div class="feature-desc">메트릭 40개 / GroupBy 10개</div></div>
+      <div class="feature-card"><div class="feature-icon">🧑‍💼</div><div class="feature-label">한국어 전담 지원</div><div class="feature-desc">시차 없는 빠른 이슈 대응</div></div>
+      <div class="feature-card"><div class="feature-icon">🔌</div><div class="feature-label">딥링크 완전 지원</div><div class="feature-desc">카카오톡·네이버 인앱브라우저 대응</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" id="slide-4">
+  <div class="slide-header">
+    <div class="slide-logo"><div class="slide-logo-mark">A</div><div class="slide-logo-text">Airbridge</div></div>
+    <div class="slide-num">4 / 7</div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-tag">경쟁사 비교</div>
+    <h1 class="slide-title">${compRows ? `${currentMMP} 대비` : '타 MMP 대비'}<br>에어브릿지의 강점</h1>
+    ${slide4Content}
+  </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide" id="slide-5">
+  <div class="slide-header">
+    <div class="slide-logo"><div class="slide-logo-mark">A</div><div class="slide-logo-text">Airbridge</div></div>
+    <div class="slide-num">5 / 7</div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-tag">도입 사례</div>
+    <h1 class="slide-title">${vertical} 버티컬<br>에어브릿지 활용 사례</h1>
+    ${caseContent}
+    ${migContent}
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" id="slide-6">
+  <div class="slide-header">
+    <div class="slide-logo"><div class="slide-logo-mark">A</div><div class="slide-logo-text">Airbridge</div></div>
+    <div class="slide-num">6 / 7</div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-tag">도입 프로세스 & 가격</div>
+    <h1 class="slide-title">에어브릿지 도입 여정</h1>
+    <div class="process-steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">무료 컨설팅</div><div class="step-desc">현황 분석 & 도입 범위 확정</div><div class="step-period">1~2주</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">정식 계약</div><div class="step-desc">연간 계약 체결 & 전담 CSM 배정</div><div class="step-period">계약 즉시</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">SDK 연동 지원</div><div class="step-desc">테스트 환경 + 연동 가이드 + 개발 지원</div><div class="step-period">2~4주</div></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">파일럿 운영</div><div class="step-desc">실제 캠페인 데이터 수집 & 대시보드 세팅</div><div class="step-period">2~4주</div></div></div>
+    </div>
+    <div class="price-box">
+      <div class="price-box-title">${clientName} 예상 요금 (${mau} MAU 기준)</div>
+      <div class="price-box-value">${mauPrice}</div>
+      <div class="price-box-note">${mau === '10만+' ? '10만 MAU 이상은 규모에 따라 맞춤 견적 제공 · 에어브릿지 BDM 문의' : 'All-inclusive — Fraud 방지·Raw data·오디언스 매니저 추가 비용 없음'}</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide" id="slide-7">
+  <div class="slide-header">
+    <div class="slide-logo"><div class="slide-logo-mark">A</div><div class="slide-logo-text">Airbridge</div></div>
+    <div class="slide-num">7 / 7</div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-tag">문의</div>
+    <h1 class="slide-title">에어브릿지 전문 인력과<br>직접 만나보세요</h1>
+    <p class="slide-subtitle">무료 컨설팅부터 기술 데모까지 — 도입 전 궁금한 점을 모두 해소해드립니다.</p>
+    <div class="contact-card">
+      <div class="contact-label">Airbridge BDM</div>
+      <div class="contact-name">이진성 <span class="contact-badge">AB180</span></div>
+      <div class="contact-info">jinsung@ab180.co</div>
+    </div>
+    ${agencyName ? `<div class="contact-card" style="margin-top:16px"><div class="contact-label">에이전시</div><div class="contact-name">${agencyName}</div></div>` : ''}
+    <p style="margin-top:32px;font-size:13px;color:var(--gray);">제안일: ${dateStr} · 본 제안서의 가격 정보는 정가 기준이며, 계약 조건에 따라 변동될 수 있습니다.</p>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">← 이전</button>
+  <div class="nav-progress" id="navDots"></div>
+  <button class="nav-btn primary" id="nextBtn" onclick="navigate(1)">다음 →</button>
+</div>
+
+<script>
+  let cur = 1;
+  const total = 7;
+  const dots = document.getElementById('navDots');
+  for(let i=1;i<=total;i++){
+    const d = document.createElement('div');
+    d.className = 'nav-dot' + (i===1?' active':'');
+    d.onclick = ()=>goTo(i);
+    dots.appendChild(d);
+  }
+  function navigate(dir){ goTo(cur+dir); }
+  function goTo(n){
+    if(n<1||n>total) return;
+    document.getElementById('slide-'+cur).classList.remove('active');
+    document.querySelectorAll('.nav-dot')[cur-1].classList.remove('active');
+    cur=n;
+    document.getElementById('slide-'+cur).classList.add('active');
+    document.querySelectorAll('.nav-dot')[cur-1].classList.add('active');
+    document.getElementById('prevBtn').style.opacity = cur===1?'0.3':'1';
+    document.getElementById('nextBtn').textContent = cur===total?'✓ 완료':'다음 →';
+    window.scrollTo(0,0);
+  }
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') navigate(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') navigate(-1);
+  });
+  document.getElementById('prevBtn').style.opacity = '0.3';
+<\/script>
+</body>
+</html>`;
+}
+</script>
+</body>
+</html>
