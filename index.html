@@ -135,9 +135,9 @@
     <div class="field">
       <label>MAU 규모 <span class="req">*</span></label>
       <div class="radio-group" id="mauGroup">
-        <label><div class="radio-btn" data-val="0-5만" data-price="연 1,200만원"><input type="radio" name="mau" value="0-5만">0 – 5만</div></label>
-        <label><div class="radio-btn" data-val="5-10만" data-price="연 1,920만원"><input type="radio" name="mau" value="5-10만">5 – 10만</div></label>
-        <label><div class="radio-btn" data-val="10만+" data-price="별도 협의"><input type="radio" name="mau" value="10만+">10만 이상</div></label>
+        <div class="radio-btn" data-val="0-5만" data-price="연 1,200만원" onclick="radioSelect(this)"><input type="radio" name="mau" value="0-5만">0 – 5만</div>
+        <div class="radio-btn" data-val="5-10만" data-price="연 1,920만원" onclick="radioSelect(this)"><input type="radio" name="mau" value="5-10만">5 – 10만</div>
+        <div class="radio-btn" data-val="10만+" data-price="별도 협의" onclick="radioSelect(this)"><input type="radio" name="mau" value="10만+">10만 이상</div>
       </div>
       <div class="price-hint" id="mauPriceHint"></div>
       <div class="err-msg" id="e-mau">MAU 규모를 선택해주세요.</div>
@@ -149,8 +149,8 @@
     <div class="field">
       <label>신규 도입 또는 이관 여부 <span class="req">*</span></label>
       <div class="radio-group" id="typeGroup">
-        <label><div class="radio-btn" data-val="신규"><input type="radio" name="type" value="신규">신규 도입</div></label>
-        <label><div class="radio-btn" data-val="이관"><input type="radio" name="type" value="이관">타 MMP 이관</div></label>
+        <div class="radio-btn" data-val="신규" onclick="radioSelect(this)"><input type="radio" name="type" value="신규">신규 도입</div>
+        <div class="radio-btn" data-val="이관" onclick="radioSelect(this)"><input type="radio" name="type" value="이관">타 MMP 이관</div>
       </div>
       <div class="err-msg" id="e-type">도입 유형을 선택해주세요.</div>
       <div class="sub-field" id="mmpField">
@@ -168,8 +168,8 @@
     <div class="field">
       <label>가격 정보 포함 여부</label>
       <div class="radio-group">
-        <label><div class="radio-btn active" data-val="yes"><input type="radio" name="showPrice" value="yes" checked>포함</div></label>
-        <label><div class="radio-btn" data-val="no"><input type="radio" name="showPrice" value="no">제외</div></label>
+        <div class="radio-btn active" data-val="yes" onclick="radioSelect(this)"><input type="radio" name="showPrice" value="yes" checked>포함</div>
+        <div class="radio-btn" data-val="no" onclick="radioSelect(this)"><input type="radio" name="showPrice" value="no">제외</div>
       </div>
       <p class="field-hint">제외 시 가격 슬라이드에서 금액이 표시되지 않습니다</p>
     </div>
@@ -335,18 +335,23 @@ function onMMPChange() {
   document.getElementById('hint-mmp').classList.toggle('show', document.getElementById('currentMMP').value === '기타');
 }
 
-// radio-btn 클릭 → change 이벤트로 처리 (label 중첩으로 인한 이중 발화 방지)
-document.querySelectorAll('input[type=radio]').forEach(inp => {
-  inp.addEventListener('change', function() {
-    const name = this.name;
-    const parentBtn = this.closest('.radio-btn');
-    document.querySelectorAll('.radio-btn').forEach(b => { if(b.querySelector('input')?.name === name) b.classList.remove('active','err'); });
-    if(parentBtn) parentBtn.classList.add('active');
-    document.getElementById('e-'+name)?.classList.remove('show');
-    if(name === 'type') document.getElementById('mmpField').classList.toggle('show', this.value === '이관');
-    if(name === 'mau') { const ph = document.getElementById('mauPriceHint'); ph.textContent = parentBtn?.dataset.price || ''; ph.classList.add('show'); }
+function radioSelect(btn) {
+  const inp = btn.querySelector('input');
+  if(!inp) return;
+  const name = inp.name;
+  inp.checked = true;
+  document.querySelectorAll('.radio-btn').forEach(b => {
+    if(b.querySelector('input')?.name === name) b.classList.remove('active','err');
   });
-});
+  btn.classList.add('active');
+  document.getElementById('e-'+name)?.classList.remove('show');
+  if(name === 'type') document.getElementById('mmpField').classList.toggle('show', btn.dataset.val === '이관');
+  if(name === 'mau') {
+    const ph = document.getElementById('mauPriceHint');
+    ph.textContent = btn.dataset.price || '';
+    ph.classList.add('show');
+  }
+}
 document.getElementById('accentColor').addEventListener('input', function() { document.getElementById('colorHex').textContent = this.value.toUpperCase(); });
 
 // ──────────────────────────────────────────────
