@@ -60,12 +60,16 @@
   .adv-toggle.open .adv-chevron { transform:rotate(180deg); }
   .adv-body { display:none; }
   .adv-body.show { display:block; }
-  .btn-generate { width:100%; padding:16px; background:var(--blue); color:white; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; transition:background .15s,transform .1s; letter-spacing:-.01em; display:flex; align-items:center; justify-content:center; gap:10px; }
-  .btn-generate:hover:not(:disabled) { background:#0A47E8; }
+  .btn-row { display:flex; gap:12px; }
+  .btn-generate { flex:1; padding:16px; color:white; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; transition:background .15s,transform .1s; letter-spacing:-.01em; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .btn-pptx { background:var(--blue); }
+  .btn-pptx:hover:not(:disabled) { background:#0A47E8; }
+  .btn-gs { background:#188038; }
+  .btn-gs:hover:not(:disabled) { background:#0f5928; }
   .btn-generate:active:not(:disabled) { transform:scale(.99); }
-  .btn-generate:disabled { background:var(--gray); cursor:not-allowed; }
+  .btn-generate:disabled { background:var(--gray)!important; cursor:not-allowed; }
   .btn-generate.success { background:var(--success)!important; }
-  .spinner { width:18px; height:18px; border:2.5px solid rgba(255,255,255,.35); border-top-color:white; border-radius:50%; animation:spin .65s linear infinite; display:none; flex-shrink:0; }
+  .spinner { width:16px; height:16px; border:2.5px solid rgba(255,255,255,.35); border-top-color:white; border-radius:50%; animation:spin .65s linear infinite; display:none; flex-shrink:0; }
   .btn-generate.loading .spinner { display:block; }
   @keyframes spin { to { transform:rotate(360deg); } }
   .footer-note { text-align:center; font-size:12px; color:var(--gray); margin-top:16px; }
@@ -200,11 +204,17 @@
     </div>
   </div>
 
-  <button class="btn-generate" id="genBtn" onclick="generate()">
-    <div class="spinner"></div>
-    <span id="btnText">PPTX 제안서 생성 &amp; 다운로드</span>
-  </button>
-  <p class="footer-note">생성된 .pptx 파일은 PowerPoint 또는 Google Slides에서 바로 열 수 있습니다.</p>
+  <div class="btn-row">
+    <button class="btn-generate btn-pptx" id="genBtnPPTX" onclick="generate('pptx')">
+      <div class="spinner"></div>
+      <span id="btnTextPPTX">PPTX 다운로드</span>
+    </button>
+    <button class="btn-generate btn-gs" id="genBtnGS" onclick="generate('gslides')">
+      <div class="spinner"></div>
+      <span id="btnTextGS">Google Slides로 열기</span>
+    </button>
+  </div>
+  <p class="footer-note">PPTX: PowerPoint에서 바로 열기  ·  Google Slides: 파일 다운로드 후 Google Drive에 업로드</p>
 </div>
 
 <script>
@@ -325,15 +335,16 @@ function onMMPChange() {
   document.getElementById('hint-mmp').classList.toggle('show', document.getElementById('currentMMP').value === '기타');
 }
 
-document.querySelectorAll('.radio-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    const inp = this.querySelector('input'); if(!inp) return;
-    const name = inp.name;
+// radio-btn 클릭 → change 이벤트로 처리 (label 중첩으로 인한 이중 발화 방지)
+document.querySelectorAll('input[type=radio]').forEach(inp => {
+  inp.addEventListener('change', function() {
+    const name = this.name;
+    const parentBtn = this.closest('.radio-btn');
     document.querySelectorAll('.radio-btn').forEach(b => { if(b.querySelector('input')?.name === name) b.classList.remove('active','err'); });
-    this.classList.add('active'); inp.checked = true;
+    if(parentBtn) parentBtn.classList.add('active');
     document.getElementById('e-'+name)?.classList.remove('show');
-    if(name === 'type') document.getElementById('mmpField').classList.toggle('show', this.dataset.val === '이관');
-    if(name === 'mau') { const ph = document.getElementById('mauPriceHint'); ph.textContent = this.dataset.price; ph.classList.add('show'); }
+    if(name === 'type') document.getElementById('mmpField').classList.toggle('show', this.value === '이관');
+    if(name === 'mau') { const ph = document.getElementById('mauPriceHint'); ph.textContent = parentBtn?.dataset.price || ''; ph.classList.add('show'); }
   });
 });
 document.getElementById('accentColor').addEventListener('input', function() { document.getElementById('colorHex').textContent = this.value.toUpperCase(); });
@@ -385,7 +396,7 @@ function getNewPainPoints() {
 // ──────────────────────────────────────────────
 // GENERATE
 // ──────────────────────────────────────────────
-async function generate() {
+async function generate(format) {
   clearErrs(); if(!validate()) return;
   const clientName=document.getElementById('clientName').value.trim();
   const aeName=document.getElementById('aeName').value.trim();
@@ -403,24 +414,34 @@ async function generate() {
   const migratedList=MIGRATION[vertical]||[];
   const compRows=(type==='이관'&&currentMMP&&COMPARISON[currentMMP])?COMPARISON[currentMMP]:null;
 
-  const btn=document.getElementById('genBtn'), btnText=document.getElementById('btnText');
-  btn.classList.add('loading'); btn.disabled=true;
+  const isGS = format === 'gslides';
+  const btn = document.getElementById(isGS ? 'genBtnGS' : 'genBtnPPTX');
+  const btnText = document.getElementById(isGS ? 'btnTextGS' : 'btnTextPPTX');
+  const otherBtn = document.getElementById(isGS ? 'genBtnPPTX' : 'genBtnGS');
+  btn.classList.add('loading'); btn.disabled=true; otherBtn.disabled=true;
+
   const steps=['기본 슬라이드 생성 중...','사례 슬라이드 생성 중...','마무리 슬라이드 생성 중...','파일 저장 중...'];
   let si=0; const iv=setInterval(()=>{if(si<steps.length)btnText.textContent=steps[si++];},500);
+
+  const fname = `에어브릿지_제안서_${clientName}.pptx`;
   try {
-    await buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,mauPrice,type,currentMMP,cases,migratedList,compRows,accentColor,font,showPrice});
-    clearInterval(iv); btn.classList.remove('loading'); btn.classList.add('success'); btnText.textContent='다운로드 완료! ✓'; savePrefs();
-    setTimeout(()=>{ btn.classList.remove('success'); btnText.textContent='PPTX 제안서 생성 & 다운로드'; btn.disabled=false; },2500);
+    await buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,mauPrice,type,currentMMP,cases,migratedList,compRows,accentColor,font,showPrice,outputFormat:format,fileName:fname});
+    clearInterval(iv); btn.classList.remove('loading'); btn.classList.add('success');
+    btnText.textContent = isGS ? 'Google Slides 열기 완료! ✓' : 'PPTX 다운로드 완료! ✓';
+    savePrefs();
+    if(isGS) setTimeout(()=>window.open('https://drive.google.com','_blank'), 800);
+    setTimeout(()=>{ btn.classList.remove('success'); btnText.textContent = isGS ? 'Google Slides로 열기' : 'PPTX 다운로드'; btn.disabled=false; otherBtn.disabled=false; },2800);
   } catch(e) {
-    clearInterval(iv); console.error(e); btn.classList.remove('loading'); btn.disabled=false;
-    btnText.textContent='PPTX 제안서 생성 & 다운로드'; alert('생성 중 오류: '+e.message);
+    clearInterval(iv); console.error(e); btn.classList.remove('loading'); btn.disabled=false; otherBtn.disabled=false;
+    btnText.textContent = isGS ? 'Google Slides로 열기' : 'PPTX 다운로드';
+    alert('생성 중 오류: '+e.message);
   }
 }
 
 // ──────────────────────────────────────────────
 // PPTX
 // ──────────────────────────────────────────────
-async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,mauPrice,type,currentMMP,cases,migratedList,compRows,accentColor,font,showPrice}) {
+async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,mauPrice,type,currentMMP,cases,migratedList,compRows,accentColor,font,showPrice,outputFormat,fileName}) {
   const pptx=new PptxGenJS();
   pptx.layout='LAYOUT_16x9'; pptx.title=`Airbridge 제안서 — ${clientName}`; pptx.author=agencyName||'Airbridge';
   const today=new Date();
@@ -713,7 +734,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   // AE 카드
   s9.addShape('rect',{x:.35,y:3.56,w:5.65,h:1.64,fill:{color:CARD_C},line:{color:CARD_C,width:0}});
   s9.addShape('rect',{x:.35,y:3.56,w:5.65,h:.04,fill:{color:ACC},line:{color:ACC,width:0}});
-  s9.addText((agencyName?agencyName+' · ':\'\')+'담당 AE',{x:.55,y:3.66,w:5.2,h:.22,fontSize:9,bold:true,color:ACC,fontFace:F});
+  s9.addText((agencyName ? agencyName+' · ' : '')+'담당 AE',{x:.55,y:3.66,w:5.2,h:.22,fontSize:9,bold:true,color:ACC,fontFace:F});
   s9.addText(aeName,{x:.55,y:3.88,w:4.0,h:.44,fontSize:22,bold:true,color:WHT,fontFace:F});
   s9.addText(aeContact,{x:.55,y:4.35,w:5.2,h:.30,fontSize:14,color:MUT,fontFace:F});
   // BDM 카드
@@ -726,7 +747,16 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   s9.addText('jinsung@ab180.co',{x:6.38,y:4.35,w:3.0,h:.28,fontSize:12,color:MUT,fontFace:F});
   s9.addText(`제안일: ${dateStr} · 본 제안서의 가격 정보는 정가 기준이며, 계약 조건에 따라 변동될 수 있습니다.`,{x:.35,y:5.15,w:9.3,h:.22,fontSize:9,color:CPY,fontFace:F});
 
-  await pptx.writeFile({fileName:`에어브릿지_제안서_${clientName}.pptx`});
+  // Google Slides: blob 다운로드 (Drive 업로드용), PPTX: 직접 다운로드
+  if(outputFormat === 'gslides') {
+    const blob = await pptx.write({outputType:'blob'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fileName || `에어브릿지_제안서_${clientName}.pptx`;
+    a.click(); URL.revokeObjectURL(url);
+  } else {
+    await pptx.writeFile({fileName: fileName || `에어브릿지_제안서_${clientName}.pptx`});
+  }
 }
 </script>
 </body>
