@@ -8,14 +8,10 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --blue: #1356FF;
-    --blue-light: #EEF2FF;
-    --blue-mid: #C7D7FE;
-    --dark: #0F172A;
-    --gray: #64748B;
-    --border: #E2E8F0;
-    --bg: #F8FAFC;
-    --white: #fff;
+    --blue: #1356FF; --blue-light: #EEF2FF; --blue-mid: #C7D7FE;
+    --dark: #0F172A; --gray: #64748B; --border: #E2E8F0;
+    --bg: #F8FAFC; --white: #fff;
+    --error: #EF4444; --success: #10B981;
   }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
   .wrap { max-width: 680px; margin: 0 auto; padding: 48px 24px 80px; }
@@ -34,33 +30,47 @@
   label .req { color: var(--blue); margin-left: 2px; }
   input[type=text] { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--dark); background: var(--white); transition: border-color .15s; outline: none; }
   input[type=text]:focus { border-color: var(--blue); }
+  input[type=text].err { border-color: var(--error); }
   select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--dark); background: var(--white); outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
   select:focus { border-color: var(--blue); }
-  .radio-group { display: flex; gap: 8px; }
+  select.err { border-color: var(--error); }
+  .err-msg { font-size: 11px; color: var(--error); margin-top: 4px; display: none; }
+  .err-msg.show { display: block; }
+  .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
   .radio-group label { cursor: pointer; }
   .radio-btn { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .15s; user-select: none; background: var(--white); }
   .radio-btn:hover { border-color: var(--blue-mid); background: var(--blue-light); }
   .radio-btn.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue); font-weight: 600; }
+  .radio-btn.err { border-color: var(--error); background: #FEF2F2; }
   .radio-btn input { display: none; }
   .sub-field { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); display: none; }
   .sub-field.show { display: block; }
-  .mau-table { background: var(--blue-light); border-radius: 8px; padding: 12px 16px; margin-top: 10px; font-size: 13px; }
-  .mau-table-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--blue-mid); }
-  .mau-table-row:last-child { border-bottom: none; }
-  .mau-table-row .range { color: var(--gray); }
-  .mau-table-row .price { font-weight: 700; color: var(--dark); }
-  /* 색상 피커 */
+  .hint-warn { font-size: 12px; color: #D97706; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 6px; padding: 8px 12px; margin-top: 8px; display: none; }
+  .hint-warn.show { display: block; }
+  .price-hint { font-size: 13px; font-weight: 700; color: var(--blue); background: var(--blue-light); border-radius: 6px; padding: 6px 12px; margin-top: 8px; display: none; }
+  .price-hint.show { display: block; }
   .color-field { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--white); }
   input[type=color] { width: 28px; height: 28px; border: none; border-radius: 4px; padding: 0; cursor: pointer; background: none; }
   input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
   input[type=color]::-webkit-color-swatch { border: none; border-radius: 4px; }
   .color-hex { font-size: 13px; font-weight: 600; color: var(--dark); letter-spacing: 0.04em; }
   .field-hint { font-size: 11px; color: var(--gray); margin-top: 5px; }
+  /* 고급 설정 접힘 */
+  .adv-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 14px 20px; background: var(--white); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 24px; }
+  .adv-toggle span { font-size: 13px; font-weight: 600; color: var(--gray); }
+  .adv-chevron { transition: transform .2s; font-size: 12px; color: var(--gray); }
+  .adv-toggle.open .adv-chevron { transform: rotate(180deg); }
+  .adv-body { display: none; }
+  .adv-body.show { display: block; }
   /* 버튼 */
-  .btn-generate { width: 100%; padding: 16px; background: var(--blue); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background .15s, transform .1s; letter-spacing: -0.01em; }
-  .btn-generate:hover { background: #0A47E8; }
-  .btn-generate:active { transform: scale(0.99); }
+  .btn-generate { width: 100%; padding: 16px; background: var(--blue); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background .15s, transform .1s; letter-spacing: -0.01em; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .btn-generate:hover:not(:disabled) { background: #0A47E8; }
+  .btn-generate:active:not(:disabled) { transform: scale(0.99); }
   .btn-generate:disabled { background: var(--gray); cursor: not-allowed; }
+  .btn-generate.success { background: var(--success) !important; }
+  .spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.35); border-top-color: white; border-radius: 50%; animation: spin .65s linear infinite; display: none; flex-shrink: 0; }
+  .btn-generate.loading .spinner { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .footer-note { text-align: center; font-size: 12px; color: var(--gray); margin-top: 16px; }
 </style>
 </head>
@@ -70,17 +80,35 @@
     <div class="logo-mark">A</div>
     <div class="logo-text">Airbridge</div>
   </div>
-
   <div class="hero">
     <h1>에어브릿지 제안서를<br>대신 제작해드립니다</h1>
     <p>광고주 정보를 입력하면 버티컬 맞춤 사례자료와<br>경쟁사 비교가 포함된 PPTX 제안서를 즉시 생성합니다.</p>
   </div>
 
+  <!-- 광고주 정보 -->
   <div class="card">
     <h2>광고주 정보</h2>
     <div class="field">
       <label>광고주명 <span class="req">*</span></label>
       <input type="text" id="clientName" placeholder="예: 00커머스" />
+      <div class="err-msg" id="e-clientName">광고주명을 입력해주세요.</div>
+    </div>
+  </div>
+
+  <!-- 담당 AE 정보 -->
+  <div class="card">
+    <h2>담당 AE 정보</h2>
+    <div class="field-row">
+      <div class="field">
+        <label>AE 이름 <span class="req">*</span></label>
+        <input type="text" id="aeName" placeholder="예: 홍길동" />
+        <div class="err-msg" id="e-aeName">AE 이름을 입력해주세요.</div>
+      </div>
+      <div class="field">
+        <label>이메일 / 연락처 <span class="req">*</span></label>
+        <input type="text" id="aeContact" placeholder="예: hong@agency.co.kr" />
+        <div class="err-msg" id="e-aeContact">이메일 또는 연락처를 입력해주세요.</div>
+      </div>
     </div>
     <div class="field">
       <label>에이전시명</label>
@@ -88,11 +116,12 @@
     </div>
   </div>
 
+  <!-- 서비스 정보 -->
   <div class="card">
     <h2>서비스 정보</h2>
     <div class="field">
       <label>버티컬 <span class="req">*</span></label>
-      <select id="vertical">
+      <select id="vertical" onchange="onVerticalChange()">
         <option value="">선택해주세요</option>
         <option value="게임">게임</option>
         <option value="엔터테인먼트">엔터테인먼트</option>
@@ -115,22 +144,22 @@
         <option value="유틸리티">유틸리티</option>
         <option value="기타">기타</option>
       </select>
+      <div class="err-msg" id="e-vertical">버티컬을 선택해주세요.</div>
+      <div class="hint-warn" id="hint-vertical">이 버티컬은 현재 사례 자료가 준비되지 않았습니다. Slide 5에 이관 고객사 목록 및 에어브릿지 지표로 대체 표시됩니다.</div>
     </div>
     <div class="field">
       <label>MAU 규모 <span class="req">*</span></label>
       <div class="radio-group" id="mauGroup">
-        <label><div class="radio-btn" data-val="0-5만"><input type="radio" name="mau" value="0-5만">0 – 5만</div></label>
-        <label><div class="radio-btn" data-val="5-10만"><input type="radio" name="mau" value="5-10만">5 – 10만</div></label>
-        <label><div class="radio-btn" data-val="10만+"><input type="radio" name="mau" value="10만+">10만 이상</div></label>
+        <label><div class="radio-btn" data-val="0-5만" data-price="연 1,200만원"><input type="radio" name="mau" value="0-5만">0 – 5만</div></label>
+        <label><div class="radio-btn" data-val="5-10만" data-price="연 1,920만원"><input type="radio" name="mau" value="5-10만">5 – 10만</div></label>
+        <label><div class="radio-btn" data-val="10만+" data-price="별도 협의"><input type="radio" name="mau" value="10만+">10만 이상</div></label>
       </div>
-      <div class="mau-table" style="margin-top:12px">
-        <div class="mau-table-row"><span class="range">0 – 5만 MAU</span><span class="price">연 1,200만원</span></div>
-        <div class="mau-table-row"><span class="range">5 – 10만 MAU</span><span class="price">연 1,920만원</span></div>
-        <div class="mau-table-row"><span class="range">10만 MAU 이상</span><span class="price">별도 협의</span></div>
-      </div>
+      <div class="price-hint" id="mauPriceHint"></div>
+      <div class="err-msg" id="e-mau">MAU 규모를 선택해주세요.</div>
     </div>
   </div>
 
+  <!-- 도입 유형 -->
   <div class="card">
     <h2>도입 유형</h2>
     <div class="field">
@@ -139,44 +168,64 @@
         <label><div class="radio-btn" data-val="신규"><input type="radio" name="type" value="신규">신규 도입</div></label>
         <label><div class="radio-btn" data-val="이관"><input type="radio" name="type" value="이관">타 MMP 이관</div></label>
       </div>
+      <div class="err-msg" id="e-type">도입 유형을 선택해주세요.</div>
       <div class="sub-field" id="mmpField">
         <label>현재 사용 중인 MMP</label>
-        <select id="currentMMP">
+        <select id="currentMMP" onchange="onMMPChange()">
           <option value="">선택해주세요</option>
           <option value="AppsFlyer">AppsFlyer</option>
           <option value="Adjust">Adjust</option>
           <option value="Dfinery">Dfinery (애드브릭스)</option>
           <option value="기타">기타 MMP</option>
         </select>
+        <div class="hint-warn" id="hint-mmp">기타 MMP는 일반 강점 비교 카드로 표시됩니다.</div>
       </div>
+    </div>
+    <div class="field">
+      <label>가격 정보 포함 여부</label>
+      <div class="radio-group">
+        <label><div class="radio-btn active" data-val="yes"><input type="radio" name="showPrice" value="yes" checked>포함</div></label>
+        <label><div class="radio-btn" data-val="no"><input type="radio" name="showPrice" value="no">제외</div></label>
+      </div>
+      <p class="field-hint">제외 시 가격 슬라이드에서 금액이 표시되지 않습니다</p>
     </div>
   </div>
 
-  <div class="card">
-    <h2>디자인 설정</h2>
-    <div class="field-row">
-      <div class="field">
-        <label>브랜드 컬러 (강조색)</label>
-        <div class="color-field">
-          <input type="color" id="accentColor" value="#3B7DE9">
-          <span class="color-hex" id="colorHex">#3B7DE9</span>
+  <!-- 고급 설정 (접힘) -->
+  <div class="adv-toggle" onclick="toggleAdv(this)">
+    <span>고급 설정 (선택사항)</span>
+    <span class="adv-chevron">▾</span>
+  </div>
+  <div class="adv-body" id="advBody">
+    <div class="card">
+      <h2>디자인 설정</h2>
+      <div class="field-row">
+        <div class="field">
+          <label>브랜드 컬러 (강조색)</label>
+          <div class="color-field">
+            <input type="color" id="accentColor" value="#3B7DE9">
+            <span class="color-hex" id="colorHex">#3B7DE9</span>
+          </div>
+          <p class="field-hint">슬라이드 상단 라인·가격·카드 제목에 적용</p>
         </div>
-        <p class="field-hint">가격·카드 제목 등 강조 요소에 적용</p>
-      </div>
-      <div class="field">
-        <label>폰트</label>
-        <select id="fontSelect">
-          <option value="Apple SD Gothic Neo">Apple SD Gothic Neo (Mac 기본)</option>
-          <option value="Malgun Gothic">맑은 고딕 (Windows 기본)</option>
-          <option value="Pretendard">Pretendard</option>
-          <option value="Noto Sans KR">Noto Sans KR</option>
-        </select>
-        <p class="field-hint">PC에 설치된 폰트여야 정상 표시됩니다</p>
+        <div class="field">
+          <label>폰트</label>
+          <select id="fontSelect">
+            <option value="Apple SD Gothic Neo">Apple SD Gothic Neo (Mac 기본)</option>
+            <option value="Malgun Gothic">맑은 고딕 (Windows 기본)</option>
+            <option value="Pretendard">Pretendard</option>
+            <option value="Noto Sans KR">Noto Sans KR</option>
+          </select>
+          <p class="field-hint">PC에 설치된 폰트여야 정상 표시됩니다</p>
+        </div>
       </div>
     </div>
   </div>
 
-  <button class="btn-generate" id="genBtn" onclick="generate()">PPTX 제안서 생성 & 다운로드</button>
+  <button class="btn-generate" id="genBtn" onclick="generate()">
+    <div class="spinner"></div>
+    <span id="btnText">PPTX 제안서 생성 &amp; 다운로드</span>
+  </button>
   <p class="footer-note">생성된 .pptx 파일은 PowerPoint 또는 Google Slides에서 바로 열 수 있습니다.</p>
 </div>
 
@@ -186,57 +235,57 @@
 // ──────────────────────────────────────────────
 const CASE_STUDIES = {
   '게임': [
-    { co:'라이온하트스튜디오', goal:'유저 행동 분석', result:'유저 온보딩 최적화·이탈 구간 파악' },
-    { co:'퍼스트 디센던트', goal:'크로스플랫폼 성과 측정', result:'PC·콘솔 광고 성과 측정·최적화' },
-    { co:'후야호 (탕후루의 달인)', goal:'데이터 마케팅 전략', result:'출시 일주일 만에 인기 차트 1위' },
-    { co:'뮤 모나크', goal:'크리에이티브 최적화', result:'로그인율 90% 이상 개선' },
+    { co:'라이온하트스튜디오', before:'신규 유저 온보딩 이탈 구간 파악 불가', result:'유저 온보딩 최적화·이탈 구간 파악' },
+    { co:'퍼스트 디센던트', before:'PC·콘솔·모바일 통합 성과 집계 불가', result:'크로스플랫폼 광고 성과 측정·최적화' },
+    { co:'후야호 (탕후루의 달인)', before:'출시 초기 채널별 유저 획득 효율 불명확', result:'출시 일주일 만에 인기 차트 1위' },
+    { co:'뮤 모나크', before:'광고 소재별 전환 기여 구분 불가', result:'로그인율 90% 이상 개선' },
   ],
   '엔터테인먼트': [
-    { co:'파라닷', goal:'전환 분석', result:'리퍼럴 유저 전환 성과 분석' },
+    { co:'파라닷', before:'리퍼럴·자연 유입 유저 전환율 비교 불가', result:'리퍼럴 유저 전환 성과 분석' },
   ],
   '금융/핀테크': [
-    { co:'현대카드', goal:'광고비 최적화', result:'AI 기반 예산 최적화로 신규 카드 발급 16% 증가' },
-    { co:'시그널플래너', goal:'데이터 통합', result:'캠페인·CRM·분석 흐름 고도화' },
+    { co:'현대카드', before:'매체별 합산 리포트로 중복 기여 발생, 예산 낭비', result:'AI 기반 예산 최적화 → 신규 카드 발급 16% 증가' },
+    { co:'시그널플래너', before:'캠페인·CRM·분석 도구 데이터 파편화', result:'캠페인·CRM·분석 흐름 통합 고도화' },
   ],
   '패션/커머스': [
-    { co:'퀸잇', goal:'데이터 파이프라인', result:'총거래액 연간 1700% 성장' },
-    { co:'Meliz', goal:'프라이버시 중심 측정', result:'MMM 도입으로 지속 성장' },
+    { co:'퀸잇', before:'채널별 전환 데이터 통합 불가로 예산 배분 비효율', result:'총거래액 연간 1700% 성장' },
+    { co:'Meliz', before:'iOS 14+ 이후 광고 성과 측정 정확도 저하', result:'MMM 도입으로 지속 성장' },
   ],
   '라이프스타일': [
-    { co:'나이틀리', goal:'성과 최적화', result:'CPA 18% 절감, 일본 앱스토어 Top 3 진입' },
-    { co:'모니모니', goal:'성과 최적화', result:'CPI 성과 10배 개선' },
-    { co:'알라미(Delight Room)', goal:'ROAS 개선', result:'글로벌 1위 알람 앱 ROAS 개선' },
-    { co:'슈무디', goal:'크로스플랫폼 분석', result:'앱 다운로드 100만+ 달성' },
+    { co:'나이틀리', before:'글로벌 시장 UA 비용 급증, CPA 관리 어려움', result:'CPA 18% 절감, 일본 앱스토어 Top 3 진입' },
+    { co:'모니모니', before:'CPI 기준 광고 효율 측정 방법 부재', result:'CPI 성과 10배 개선' },
+    { co:'알라미(Delight Room)', before:'글로벌 다국가 광고 성과 단일 대시보드 관리 불가', result:'글로벌 1위 알람 앱 ROAS 개선' },
+    { co:'슈무디', before:'웹·앱 유입 통합 분석 불가', result:'앱 다운로드 100만+ 달성' },
   ],
   '비즈니스서비스': [
-    { co:'원티드랩', goal:'웹투앱 전환', result:'CPA 38% 절감' },
-    { co:'삼쩜삼', goal:'성과 최적화', result:'앱 다운로드 778만, CPI 최적화' },
-    { co:'뤼튼', goal:'ROAS 최적화', result:'잔존 성과 분석으로 매체 효율화' },
+    { co:'원티드랩', before:'웹 광고 → 앱 다운로드 전환 경로 추적 불가', result:'CPA 38% 절감' },
+    { co:'삼쩜삼', before:'채널별 CPI 비교 불가로 예산 낭비 발생', result:'앱 다운로드 778만, CPI 최적화' },
+    { co:'뤼튼', before:'매체별 ROAS 집계 기준 불통일', result:'잔존 성과 분석으로 매체 효율화' },
   ],
   '뷰티/의료': [
-    { co:'강남언니', goal:'리타게팅', result:'CAC 51.8% 감소' },
+    { co:'강남언니', before:'리타게팅 비용 대비 신규 고객 비용 구분 불가', result:'CAC 51.8% 감소' },
   ],
   '헬스케어/스포츠': [
-    { co:'닥터나우', goal:'웹투앱 전환', result:'웹사이트→앱 전환 성과 분석' },
+    { co:'닥터나우', before:'웹사이트 방문자의 앱 전환 여정 추적 불가', result:'웹사이트→앱 전환 성과 분석' },
   ],
   '여행': [
-    { co:'고투조이', goal:'광고사기 방지', result:'제휴마케팅 광고사기 90% 감소' },
-    { co:'WAUG', goal:'웹투앱 전환', result:'웹투앱 전환율 향상' },
+    { co:'고투조이', before:'제휴마케팅 클릭 위조로 광고비 손실', result:'제휴마케팅 광고사기 90% 감소' },
+    { co:'WAUG', before:'웹 랜딩 후 앱으로 자연스러운 유도 불가', result:'웹투앱 전환율 향상' },
   ],
   '광고': [
-    { co:'플레이오', goal:'리텐션 분석', result:'30일 리텐션 30% 달성' },
+    { co:'플레이오', before:'앱 설치 후 30일 유저 잔존율 측정 불가', result:'30일 리텐션 30% 달성' },
   ],
   '농업/애그테크': [
-    { co:'그린랩스', goal:'CRM 성과 분석', result:'중장기적 CRM 전환 성과 분석' },
+    { co:'그린랩스', before:'CRM 캠페인 중장기 전환 성과 측정 불가', result:'중장기적 CRM 전환 성과 분석' },
   ],
   'Pet(반려동물)': [
-    { co:'Bite Me', goal:'오가닉 분석', result:'오가닉 유입 키워드 발굴' },
+    { co:'Bite Me', before:'자연 유입 유저의 키워드 출처 파악 불가', result:'오가닉 유입 키워드 발굴' },
   ],
   '소셜/데이팅': [
-    { co:'Bleet', goal:'딥링크 & UA 성장', result:'가입 프로모션 성과 10배 개선' },
+    { co:'Bleet', before:'가입 프로모션 링크 클릭 후 앱 연결 실패로 전환율 저조', result:'가입 프로모션 성과 10배 개선' },
   ],
   '부동산': [
-    { co:'다방', goal:'딥링크 최적화', result:'딥링크 제작 리소스 90% 절감' },
+    { co:'다방', before:'매물 연결 딥링크 개별 제작에 리소스 과다 소모', result:'딥링크 제작 리소스 90% 절감' },
   ],
 };
 
@@ -265,42 +314,60 @@ const COMPARISON = {
     ['네이버·카카오 키워드 연동','MMP 중 유일 지원','미지원'],
     ['가격 책정','MAU 기반 (예측 가능)','설치 수 기반 (급증 시 비용 폭등)'],
     ['웹투앱 트래킹','완전 지원','Smart Banner 기능만'],
-    ['한국어 지원','전담 한국 CS','미지원'],
-    ['대시보드 자유도','메트릭 40개, GroupBy 10개','메트릭 25개, GroupBy 1개'],
-    ['통합 대시보드','iOS·Android·SKAdNetwork·웹 통합','각각 분리 제공'],
   ],
   'Adjust': [
     ['국내 검색광고 키워드','네이버·카카오 실시간 지원','미지원'],
     ['웹투앱 트래킹','완전 지원','정적·파편화된 기능'],
     ['Predictive LTV','전체 제공','SKAdNetwork 한정'],
-    ['대시보드 자유도','메트릭 40개, GroupBy 10개','메트릭 25개, GroupBy 6개'],
     ['가격 책정','MAU 기반 (예측 가능)','전환 수 기반 (급증 시 비용 폭등)'],
-    ['UTM 파라미터 자동 분석','지원','미지원'],
-    ['SKAdNetwork 중복기여 판별','지원','미지원'],
     ['한국어 지원','전담 한국 CS','미지원'],
   ],
   'Dfinery': [
     ['SAN 공식 연동','Google·Meta·ASA 공식 파트너','비공식 방식 → 계정 정지 리스크'],
-    ['기여 분석 객관성','고정 로직 → 일관된 결과','광고주 설정에 따라 결과 변동'],
-    ['클릭/노출 로그 수집','지원 (View-through 포함)','불가 → UTM 기반만 사용'],
+    ['기여 분석 객관성','고정 로직 → 일관된 결과','설정에 따라 결과 변동'],
+    ['클릭/노출 로그 수집','지원 (View-through 포함)','불가 → UTM 기반만'],
     ['광고 최적화','매체 알고리즘 연동','최적화 제약'],
     ['데이터 중립성','고객 동의 없이 공유 불가','3rd party DMP 활용 가능'],
   ],
 };
 
 // ──────────────────────────────────────────────
-// UI INTERACTIONS
+// UI
 // ──────────────────────────────────────────────
+function toggleAdv(el) {
+  el.classList.toggle('open');
+  document.getElementById('advBody').classList.toggle('show');
+}
+
+function onVerticalChange() {
+  const v = document.getElementById('vertical').value;
+  const hasCases = v && CASE_STUDIES[v] && CASE_STUDIES[v].length > 0;
+  document.getElementById('hint-vertical').classList.toggle('show', !!v && !hasCases);
+  if(v) { document.getElementById('vertical').classList.remove('err'); document.getElementById('e-vertical').classList.remove('show'); }
+}
+
+function onMMPChange() {
+  const mmp = document.getElementById('currentMMP').value;
+  document.getElementById('hint-mmp').classList.toggle('show', mmp === '기타');
+}
+
 document.querySelectorAll('.radio-btn').forEach(btn => {
   btn.addEventListener('click', function() {
-    const name = this.querySelector('input').name;
+    const inp = this.querySelector('input');
+    if(!inp) return;
+    const name = inp.name;
     document.querySelectorAll('.radio-btn').forEach(b => {
-      if(b.querySelector('input') && b.querySelector('input').name === name) b.classList.remove('active');
+      if(b.querySelector('input')?.name === name) b.classList.remove('active','err');
     });
     this.classList.add('active');
-    this.querySelector('input').checked = true;
-    if(name === 'type') {
-      document.getElementById('mmpField').classList.toggle('show', this.dataset.val === '이관');
+    inp.checked = true;
+    const errEl = document.getElementById('e-' + name);
+    if(errEl) errEl.classList.remove('show');
+    if(name === 'type') document.getElementById('mmpField').classList.toggle('show', this.dataset.val === '이관');
+    if(name === 'mau') {
+      const ph = document.getElementById('mauPriceHint');
+      ph.textContent = this.dataset.price;
+      ph.classList.add('show');
     }
   });
 });
@@ -310,21 +377,96 @@ document.getElementById('accentColor').addEventListener('input', function() {
 });
 
 // ──────────────────────────────────────────────
-// PAIN POINTS DATA
+// LOCALSTORAGE
+// ──────────────────────────────────────────────
+(function loadPrefs() {
+  try {
+    const d = JSON.parse(localStorage.getItem('ab_prefs') || '{}');
+    if(d.aeName)      document.getElementById('aeName').value = d.aeName;
+    if(d.aeContact)   document.getElementById('aeContact').value = d.aeContact;
+    if(d.agencyName)  document.getElementById('agencyName').value = d.agencyName;
+    if(d.accent)      { document.getElementById('accentColor').value = d.accent; document.getElementById('colorHex').textContent = d.accent.toUpperCase(); }
+    if(d.font)        document.getElementById('fontSelect').value = d.font;
+  } catch(e) {}
+})();
+
+function savePrefs() {
+  try {
+    localStorage.setItem('ab_prefs', JSON.stringify({
+      aeName:     document.getElementById('aeName').value,
+      aeContact:  document.getElementById('aeContact').value,
+      agencyName: document.getElementById('agencyName').value,
+      accent:     document.getElementById('accentColor').value,
+      font:       document.getElementById('fontSelect').value,
+    }));
+  } catch(e) {}
+}
+
+// ──────────────────────────────────────────────
+// VALIDATION
+// ──────────────────────────────────────────────
+function clearErrs() {
+  document.querySelectorAll('.err-msg').forEach(el => el.classList.remove('show'));
+  document.querySelectorAll('.err').forEach(el => el.classList.remove('err'));
+}
+
+function validate() {
+  let first = null;
+  function markText(id) {
+    const el = document.getElementById(id);
+    if(!el.value.trim()) {
+      el.classList.add('err');
+      document.getElementById('e-' + id)?.classList.add('show');
+      if(!first) first = el;
+      return false;
+    }
+    return true;
+  }
+  function markSelect(id) {
+    const el = document.getElementById(id);
+    if(!el.value) {
+      el.classList.add('err');
+      document.getElementById('e-' + id)?.classList.add('show');
+      if(!first) first = el;
+      return false;
+    }
+    return true;
+  }
+  function markRadio(name, groupId) {
+    if(!document.querySelector(`input[name="${name}"]:checked`)) {
+      document.querySelectorAll('.radio-btn').forEach(b => { if(b.querySelector('input')?.name === name) b.classList.add('err'); });
+      document.getElementById('e-' + name)?.classList.add('show');
+      if(!first) first = document.getElementById(groupId);
+      return false;
+    }
+    return true;
+  }
+  markText('clientName');
+  markText('aeName');
+  markText('aeContact');
+  markSelect('vertical');
+  markRadio('mau', 'mauGroup');
+  markRadio('type', 'typeGroup');
+  if(first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+  return !first;
+}
+
+// ──────────────────────────────────────────────
+// PAIN POINTS
 // ──────────────────────────────────────────────
 function getPainPoints(mmp) {
   if(mmp === 'AppsFlyer') return [
     'Fraud·Raw data·Organic 데이터 모두 Add-on — 기본 기능에 별도 비용 발생',
     '네이버·카카오 검색광고 비용 연동 불가 — 국내 주요 매체 ROAS 파악 어려움',
-    '해외 서버 데이터 저장 — 개인정보보호법·ISMS 리스크',
     '설치(Install) 기반 과금 — 캠페인 성과 좋을수록 비용 예측 불가',
+    '해외 서버 데이터 저장 — 개인정보보호법·ISMS 리스크',
     '한국어 지원 부재 — 이슈 발생 시 대응 속도 저하',
   ];
   if(mmp === 'Adjust') return [
     '네이버·카카오 검색광고 키워드 데이터 미지원 — 국내 매체 ROAS 측정 한계',
+    '전환 수 기반 과금 — 캠페인 증가 시 비용 예측 불가',
     'Predictive LTV는 SKAdNetwork 한정만 지원',
     '웹투앱 트래킹이 정적·파편화 — 웹 유입→앱 전환 여정 분석 어려움',
-    '전환 수 기반 과금 — 캠페인 증가 시 비용 예측 불가',
     '한국어 지원 부재 — 이슈 대응 속도 저하',
   ];
   if(mmp === 'Dfinery') return [
@@ -332,6 +474,7 @@ function getPainPoints(mmp) {
     '기여 분석 결과가 설정에 따라 변동 — 데이터 신뢰도 저하',
     'View-through 측정 불가 — UTM 기반 한계',
     '매체 알고리즘 최적화 제약 — 마케팅 예산 효율 저하',
+    '한국어 전담 지원 부재 — 이슈 대응 지연',
   ];
   return [
     '해외 서버 데이터 저장 — 개인정보보호법·ISMS 리스크',
@@ -352,322 +495,310 @@ function getNewPainPoints() {
 }
 
 // ──────────────────────────────────────────────
-// GENERATOR
+// GENERATE
 // ──────────────────────────────────────────────
 async function generate() {
+  clearErrs();
+  if(!validate()) return;
+
   const clientName  = document.getElementById('clientName').value.trim();
+  const aeName      = document.getElementById('aeName').value.trim();
+  const aeContact   = document.getElementById('aeContact').value.trim();
   const agencyName  = document.getElementById('agencyName').value.trim();
   const vertical    = document.getElementById('vertical').value;
-  const mau         = document.querySelector('input[name="mau"]:checked')?.value;
-  const type        = document.querySelector('input[name="type"]:checked')?.value;
+  const mau         = document.querySelector('input[name="mau"]:checked').value;
+  const type        = document.querySelector('input[name="type"]:checked').value;
   const currentMMP  = document.getElementById('currentMMP').value;
+  const showPrice   = document.querySelector('input[name="showPrice"]:checked')?.value !== 'no';
   const accentColor = document.getElementById('accentColor').value;
   const font        = document.getElementById('fontSelect').value;
-
-  if(!clientName){ alert('광고주명을 입력해주세요.'); return; }
-  if(!vertical)  { alert('버티컬을 선택해주세요.');  return; }
-  if(!mau)       { alert('MAU 규모를 선택해주세요.'); return; }
-  if(!type)      { alert('도입 유형을 선택해주세요.'); return; }
-
-  const mauPrice   = mau === '0-5만' ? '연 1,200만원' : mau === '5-10만' ? '연 1,920만원' : '별도 협의';
-  const cases      = CASE_STUDIES[vertical] || [];
-  const migratedList = MIGRATION[vertical] || [];
-  const compRows   = (type === '이관' && currentMMP && COMPARISON[currentMMP]) ? COMPARISON[currentMMP] : null;
+  const mauPrice    = mau === '0-5만' ? '연 1,200만원' : mau === '5-10만' ? '연 1,920만원' : '별도 협의';
+  const cases       = CASE_STUDIES[vertical] || [];
+  const migratedList= MIGRATION[vertical] || [];
+  const compRows    = (type === '이관' && currentMMP && COMPARISON[currentMMP]) ? COMPARISON[currentMMP] : null;
 
   const btn = document.getElementById('genBtn');
-  btn.textContent = '생성 중...';
+  const btnText = document.getElementById('btnText');
+  btn.classList.add('loading');
   btn.disabled = true;
+
+  const steps = ['슬라이드 생성 중 2/7...','슬라이드 생성 중 4/7...','슬라이드 생성 중 6/7...','파일 저장 중...'];
+  let si = 0;
+  const iv = setInterval(() => { if(si < steps.length) btnText.textContent = steps[si++]; }, 350);
+
   try {
-    await generatePPTX({ clientName, agencyName, vertical, mau, mauPrice, type, currentMMP, cases, migratedList, compRows, accentColor, font });
+    await buildPPTX({ clientName, aeName, aeContact, agencyName, vertical, mau, mauPrice, type, currentMMP, cases, migratedList, compRows, accentColor, font, showPrice });
+    clearInterval(iv);
+    btn.classList.remove('loading');
+    btn.classList.add('success');
+    btnText.textContent = '다운로드 완료! ✓';
+    savePrefs();
+    setTimeout(() => {
+      btn.classList.remove('success');
+      btnText.textContent = 'PPTX 제안서 생성 & 다운로드';
+      btn.disabled = false;
+    }, 2500);
   } catch(e) {
+    clearInterval(iv);
     console.error(e);
-    alert('생성 중 오류가 발생했습니다: ' + e.message);
-  } finally {
-    btn.textContent = 'PPTX 제안서 생성 & 다운로드';
+    btn.classList.remove('loading');
     btn.disabled = false;
+    btnText.textContent = 'PPTX 제안서 생성 & 다운로드';
+    alert('생성 중 오류: ' + e.message);
   }
 }
 
 // ──────────────────────────────────────────────
-// PPTX GENERATION
+// PPTX
 // ──────────────────────────────────────────────
-async function generatePPTX({ clientName, agencyName, vertical, mau, mauPrice, type, currentMMP, cases, migratedList, compRows, accentColor, font }) {
-
+async function buildPPTX({ clientName, aeName, aeContact, agencyName, vertical, mau, mauPrice, type, currentMMP, cases, migratedList, compRows, accentColor, font, showPrice }) {
   const pptx = new PptxGenJS();
-  pptx.layout  = 'LAYOUT_16x9'; // 10" × 5.625"
-  pptx.title   = `Airbridge 제안서 — ${clientName}`;
-  pptx.author  = 'AB180 Airbridge';
+  pptx.layout = 'LAYOUT_16x9';
+  pptx.title  = `Airbridge 제안서 — ${clientName}`;
+  pptx.author = agencyName || 'Airbridge';
 
   const today  = new Date();
   const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
 
-  // ── Colors ──
-  const BG      = '161B2E';
-  const CARD_C  = '1E2438';
-  const WHITE_C = 'FFFFFF';
-  const MUTED_C = '8B92A5';
-  const COPY_C  = '4A5568';
-  const ACCENT  = accentColor.replace('#','');
-  const F       = font;
+  const BG     = '161B2E';
+  const CARD_C = '1E2438';
+  const CARD_A = '243050';
+  const WHT    = 'FFFFFF';
+  const MUT    = '8B92A5';
+  const CPY    = '4A5568';
+  const ACC    = accentColor.replace('#','');
+  const F      = font;
 
-  // ── Layout presets (inches, LAYOUT_16x9 = 10" × 5.625") ──
-  const CARD1  = { x:0.35, y:1.85, w:9.3,  h:3.38 };
-  const CARD_L = { x:0.35, y:1.85, w:4.5,  h:3.38 };
-  const CARD_R = { x:5.15, y:1.85, w:4.5,  h:3.38 };
+  const CL = { x:0.35, y:1.85, w:4.5, h:3.38 };
+  const CR = { x:5.15, y:1.85, w:4.5, h:3.38 };
+  const C1 = { x:0.35, y:1.85, w:9.3, h:3.38 };
 
-  // ── Helpers ──
   function base(slide, label) {
     slide.background = { color: BG };
-    slide.addText(label, { x:0.35, y:0.12, w:5, h:0.22, fontSize:8, color:MUTED_C, fontFace:F });
-    slide.addText('Airbridge', { x:8.35, y:0.08, w:1.6, h:0.3, fontSize:12, bold:true, color:WHITE_C, fontFace:F, align:'right' });
-    slide.addText('Copyright \u00A9Airbridge 2026. All rights reserved.', { x:0.35, y:5.38, w:9.3, h:0.2, fontSize:7, color:COPY_C, fontFace:F });
+    slide.addShape('rect', { x:0, y:0, w:10, h:0.055, fill:{ color:ACC }, line:{ color:ACC, width:0 } });
+    slide.addText(label, { x:0.35, y:0.13, w:5, h:0.22, fontSize:8, color:MUT, fontFace:F });
+    slide.addText('Airbridge', { x:8.35, y:0.09, w:1.6, h:0.3, fontSize:12, bold:true, color:WHT, fontFace:F, align:'right' });
+    slide.addText('Copyright ©Airbridge 2026. All rights reserved.', { x:0.35, y:5.38, w:9.3, h:0.2, fontSize:7, color:CPY, fontFace:F });
   }
 
-  function mainTitle(slide, text) {
-    slide.addText(text, { x:0.5, y:0.34, w:9, h:0.92, fontSize:30, bold:true, color:WHITE_C, fontFace:F, align:'center', wrap:true });
+  function title(slide, text) {
+    slide.addText(text, { x:0.5, y:0.36, w:9, h:0.9, fontSize:29, bold:true, color:WHT, fontFace:F, align:'center', wrap:true });
   }
 
-  function subLine(slide, text) {
-    slide.addText(text, { x:1.0, y:1.27, w:8, h:0.52, fontSize:12, color:WHITE_C, fontFace:F, align:'center', wrap:true });
+  function sub(slide, text) {
+    slide.addText(text, { x:1.0, y:1.29, w:8, h:0.52, fontSize:12, color:WHT+'CC', fontFace:F, align:'center', wrap:true });
   }
 
-  function addCard(slide, pos) {
+  function card(slide, pos) {
     slide.addShape('rect', { x:pos.x, y:pos.y, w:pos.w, h:pos.h, fill:{ color:CARD_C }, line:{ color:CARD_C, width:0 } });
   }
 
-  function addCardTitle(slide, pos, text, color) {
-    slide.addText(text, { x:pos.x+0.22, y:pos.y+0.18, w:pos.w-0.44, h:0.36, fontSize:15, bold:true, color:color||WHITE_C, fontFace:F });
+  function cardTitle(slide, pos, text) {
+    slide.addText(text, { x:pos.x+0.22, y:pos.y+0.18, w:pos.w-0.44, h:0.34, fontSize:14, bold:true, color:ACC, fontFace:F });
   }
 
-  // items: string[] or { label, desc }[]
-  function addItems(slide, pos, items, hasTitle, opts) {
-    const { itemH=0.58, fSize=12, tColor=WHITE_C, dColor=MUTED_C } = opts||{};
-    const sx = pos.x + 0.22;
-    const sw = pos.w - 0.44;
-    const sy = pos.y + (hasTitle ? 0.65 : 0.22);
-    items.forEach((item, i) => {
-      const iy = sy + i * itemH;
+  function items(slide, pos, list, hasTitle, opts) {
+    const { ih=0.72, fs=12, tc=WHT, dc=MUT } = opts||{};
+    const sx = pos.x+0.22, sw = pos.w-0.44;
+    const sy = pos.y + (hasTitle ? 0.62 : 0.22);
+    list.forEach((item, i) => {
+      const iy = sy + i*ih;
       if(typeof item === 'string') {
-        slide.addText(item, { x:sx, y:iy, w:sw, h:itemH*0.88, fontSize:fSize, color:tColor, fontFace:F, wrap:true, valign:'middle' });
+        slide.addText('▸  ' + item, { x:sx, y:iy, w:sw, h:ih*0.86, fontSize:fs, color:tc, fontFace:F, wrap:true, valign:'middle' });
       } else {
-        slide.addText(item.label, { x:sx, y:iy, w:sw, h:itemH*0.4, fontSize:fSize+1, bold:true, color:tColor, fontFace:F });
-        if(item.desc) {
-          slide.addText(item.desc, { x:sx, y:iy+itemH*0.42, w:sw, h:itemH*0.52, fontSize:fSize-1, color:dColor, fontFace:F, wrap:true });
-        }
+        slide.addText(item.label, { x:sx, y:iy, w:sw, h:ih*0.42, fontSize:fs+1, bold:true, color:tc, fontFace:F });
+        if(item.desc) slide.addText(item.desc, { x:sx, y:iy+ih*0.44, w:sw, h:ih*0.52, fontSize:fs-1, color:dc, fontFace:F, wrap:true });
       }
     });
   }
 
-  // ──────────────────────────────────
-  // SLIDE 1 — 광고주 현황 진단
-  // ──────────────────────────────────
+  // ── S1 광고주 현황 진단 ──
   const s1 = pptx.addSlide();
   base(s1, '광고주 현황 진단');
-  mainTitle(s1, `${clientName}의 현재 광고 성과 측정 환경`);
+  title(s1, `${clientName}의 현재 광고 성과 측정 환경`);
+  const cLabel = type==='이관' ? `CASE B — ${currentMMP||'타 MMP'} 이관 검토` : 'CASE A — MMP 신규 도입';
+  const bColor = type==='이관' ? 'D97706' : ACC;
+  s1.addShape('rect', { x:3.0, y:1.30, w:4.0, h:0.30, fill:{ color:bColor+'33' }, line:{ color:bColor, width:1 } });
+  s1.addText(cLabel, { x:3.0, y:1.30, w:4.0, h:0.30, fontSize:10, bold:true, color:bColor, fontFace:F, align:'center', valign:'middle' });
+  const allPP = type==='이관' ? getPainPoints(currentMMP) : getNewPainPoints();
+  card(s1, C1);
+  items(s1, C1, allPP.slice(0,3), false, { ih:1.02, fs:13, tc:WHT });
+  s1.addNotes('추가 Pain Points (발표 참고):\n' + allPP.slice(3).map((p,i)=>`${i+4}. ${p}`).join('\n'));
 
-  const caseLabel  = type === '이관' ? `CASE B \u2014 ${currentMMP||'타 MMP'} 이관 검토` : 'CASE A \u2014 MMP 신규 도입';
-  const badgeColor = type === '이관' ? 'D97706' : ACCENT;
-  s1.addShape('rect', { x:3.0, y:1.28, w:4.0, h:0.3, fill:{ color:badgeColor+'33' }, line:{ color:badgeColor, width:1 } });
-  s1.addText(caseLabel, { x:3.0, y:1.28, w:4.0, h:0.3, fontSize:10, bold:true, color:badgeColor, fontFace:F, align:'center', valign:'middle' });
-
-  addCard(s1, CARD1);
-  const pp = type === '이관' ? getPainPoints(currentMMP) : getNewPainPoints();
-  addItems(s1, CARD1, pp, false, { itemH:0.61, fSize:12, tColor:WHITE_C });
-
-  // ──────────────────────────────────
-  // SLIDE 2 — Why MMP
-  // ──────────────────────────────────
+  // ── S2 Why MMP ──
   const s2 = pptx.addSlide();
   base(s2, 'Why MMP');
-  mainTitle(s2, '왜 MMP가 필요한가');
-  subLine(s2, 'MMP는 광고 매체별 앱 성과를 중립적으로 측정해 전환에 기여한 매체를 정확히 식별합니다.');
-
-  addCard(s2, CARD_L);
-  addCard(s2, CARD_R);
-  addCardTitle(s2, CARD_L, '문제 상황');
-  addCardTitle(s2, CARD_R, 'MMP 도입 후');
-
-  addItems(s2, CARD_L, [
-    '성과 측정 기준 부재 \u2014 매체별 리포트 합산, 중복 기여 발생',
-    '유저 여정 단절 \u2014 웹\u2192앱 링크 이동 시 콘텐츠 미연결',
-    '광고 사기 \u2014 클릭 위조·중복 기여 필터링 불가',
-    '리타게팅 비효율 \u2014 이벤트 세그먼트 수동 생성 한계',
-    'SDK 부담 \u2014 매체마다 별도 연동 개발 필요',
-  ], true, { itemH:0.52, fSize:11, tColor:WHITE_C });
-
-  addItems(s2, CARD_R, [
-    '채널별 전환 기준을 하나로 통합, 정확한 매체 비교 가능',
+  title(s2, '왜 MMP가 필요한가');
+  sub(s2, 'MMP는 광고 매체별 앱 성과를 중립적으로 측정해 전환에 기여한 매체를 정확히 식별합니다.');
+  card(s2, CL); card(s2, CR);
+  cardTitle(s2, CL, 'MMP 없을 때 문제');
+  cardTitle(s2, CR, 'MMP 도입 후');
+  items(s2, CL, [
+    '성과 측정 기준 부재 — 매체별 리포트 합산, 중복 기여 발생',
+    '유저 여정 단절 — 웹→앱 이동 시 콘텐츠 미연결',
+    '광고 사기 피해 — 클릭 위조·중복 기여 필터링 불가',
+  ], true, { ih:0.86, fs:11, tc:WHT });
+  items(s2, CR, [
+    '채널별 전환 기준 통합 — 정확한 매체 비교 가능',
     '딥링크로 끊김 없는 여정 + 크로스플랫폼 어트리뷰션',
     '클릭 위조·중복 기여 자동 필터링으로 예산 보호',
-    '이벤트 세그먼트 자동 생성 \u2192 매체 자동 연동',
-    'SDK 1회 설치로 350개+ 매체 성과 측정',
-  ], true, { itemH:0.52, fSize:11, tColor:WHITE_C });
+  ], true, { ih:0.86, fs:11, tc:WHT });
+  s2.addNotes('추가 포인트:\n4. 리타게팅 비효율 → 이벤트 세그먼트 자동 생성으로 매체 자동 연동\n5. SDK 1회 설치로 350개+ 매체 성과 측정');
 
-  // ──────────────────────────────────
-  // SLIDE 3 — 에어브릿지란?
-  // ──────────────────────────────────
+  // ── S3 에어브릿지란? ──
   const s3 = pptx.addSlide();
   base(s3, '에어브릿지란?');
-  mainTitle(s3, '한국 시장에 특화된 MMP, Airbridge');
-  subLine(s3, 'ARR CAGR +47.7% · 고객사 수 CAGR +75.4% \u2014 가장 빠르게 성장한 MMP');
-
-  addCard(s3, CARD_L);
-  addCard(s3, CARD_R);
-
-  addItems(s3, CARD_L, [
-    { label:'한국 데이터 서버', desc:'AWS 서울 리전 · ISMS 인증' },
+  title(s3, '한국 시장에 특화된 MMP, Airbridge');
+  sub(s3, 'ARR CAGR +47.7% · 고객사 수 CAGR +75.4%  (2023 Q1 – 2025 Q4 기준) — 가장 빠르게 성장한 MMP');
+  card(s3, CL); card(s3, CR);
+  items(s3, CL, [
+    { label:'한국 데이터 서버', desc:'AWS 서울 리전 · ISMS 인증 (2022 취득)' },
     { label:'국내 매체 단독 연동', desc:'네이버·카카오·토스·당근 비용 연동 MMP 유일' },
     { label:'All-inclusive 요금제', desc:'Fraud·Raw data·오디언스 추가 비용 없음' },
-  ], false, { itemH:1.0, fSize:13, tColor:WHITE_C });
-
-  addItems(s3, CARD_R, [
+  ], false, { ih:1.0, fs:13, tc:WHT });
+  items(s3, CR, [
     { label:'자유로운 대시보드', desc:'메트릭 40개 / GroupBy 10개' },
     { label:'한국어 전담 지원', desc:'시차 없는 빠른 이슈 대응' },
     { label:'딥링크 완전 지원', desc:'카카오톡·네이버 인앱브라우저 대응' },
-  ], false, { itemH:1.0, fSize:13, tColor:WHITE_C });
+  ], false, { ih:1.0, fs:13, tc:WHT });
 
-  // ──────────────────────────────────
-  // SLIDE 4 — 경쟁사 비교
-  // ──────────────────────────────────
+  // ── S4 경쟁사 비교 ──
   const s4 = pptx.addSlide();
   base(s4, '경쟁사 비교');
-  mainTitle(s4, compRows ? `${currentMMP} 대비 에어브릿지의 강점` : '타 MMP 대비 에어브릿지의 강점');
-
-  addCard(s4, CARD_L);
-  addCard(s4, CARD_R);
-  addCardTitle(s4, CARD_L, 'Airbridge', ACCENT);
-  addCardTitle(s4, CARD_R, compRows ? currentMMP : '타 MMP');
+  title(s4, compRows ? `${currentMMP} 대비 에어브릿지의 강점` : '타 MMP 대비 에어브릿지의 강점');
 
   if(compRows) {
-    const top5 = compRows.slice(0, 5);
-    addItems(s4, CARD_L, top5.map(r => r[1]), true, { itemH:0.52, fSize:11, tColor:WHITE_C });
-    addItems(s4, CARD_R, top5.map(r => `${r[0]}: ${r[2]}`), true, { itemH:0.52, fSize:11, tColor:'FFBA7B' });
+    const rows5 = compRows.slice(0,5);
+    const hdr = [
+      { text:'비교 항목', options:{ bold:true, color:WHT, fill:{ color:ACC }, fontFace:F, fontSize:10, align:'center', valign:'middle' } },
+      { text:'Airbridge  ✔', options:{ bold:true, color:WHT, fill:{ color:ACC }, fontFace:F, fontSize:10, align:'center', valign:'middle' } },
+      { text:currentMMP+'  ✖', options:{ bold:true, color:WHT, fill:{ color:ACC }, fontFace:F, fontSize:10, align:'center', valign:'middle' } },
+    ];
+    const dataRows = rows5.map((r, i) => {
+      const bg = i%2===0 ? CARD_C : CARD_A;
+      return [
+        { text:r[0], options:{ bold:true, color:WHT, fill:{ color:bg }, fontFace:F, fontSize:10, valign:'middle' } },
+        { text:r[1], options:{ color:WHT, fill:{ color:bg }, fontFace:F, fontSize:10, valign:'middle' } },
+        { text:r[2], options:{ color:MUT, fill:{ color:bg }, fontFace:F, fontSize:10, valign:'middle' } },
+      ];
+    });
+    s4.addTable([hdr, ...dataRows], {
+      x:0.35, y:1.85, w:9.3, colW:[2.6, 3.35, 3.35], rowH:0.57,
+      border:{ type:'solid', color:'2D3748', pt:0.5 },
+      fontFace:F, fontSize:10,
+    });
   } else {
-    addItems(s4, CARD_L, [
-      { label:'국내 매체 키워드 연동', desc:'네이버·카카오 실시간 지원 \u2014 MMP 중 유일' },
-      { label:'MAU 기반 예측 가능 요금', desc:'설치·전환 수 과금 없음 \u2014 비용 스파이크 없음' },
-      { label:'All-inclusive 포함', desc:'Fraud·Raw data·오디언스 기본 제공' },
-    ], true, { itemH:0.87, fSize:12, tColor:WHITE_C });
-    addItems(s4, CARD_R, [
-      { label:'통합 대시보드', desc:'iOS·Android·SKAdNetwork·웹 한 화면 비교' },
-      { label:'한국어 전담 CS', desc:'국내 시차 없는 즉각 이슈 대응' },
-      { label:'웹투앱 완전 지원', desc:'웹 유입 \u2192 앱 전환 여정 완전 트래킹' },
-    ], true, { itemH:0.87, fSize:12, tColor:WHITE_C });
+    card(s4, CL); card(s4, CR);
+    cardTitle(s4, CL, 'Airbridge ✔');
+    cardTitle(s4, CR, '타 MMP ✖');
+    items(s4, CL, [
+      { label:'국내 매체 키워드 연동', desc:'네이버·카카오 실시간 지원 — MMP 중 유일' },
+      { label:'MAU 기반 예측 가능 요금', desc:'설치·전환 수 과금 없음 — 비용 스파이크 없음' },
+      { label:'All-inclusive 기본 포함', desc:'Fraud·Raw data·오디언스 추가 비용 없음' },
+    ], true, { ih:0.88, fs:12, tc:WHT });
+    items(s4, CR, [
+      { label:'국내 매체 연동 미지원', desc:'네이버·카카오 비용 데이터 ROAS 파악 불가' },
+      { label:'설치·전환 수 기반 과금', desc:'캠페인 성과 좋을수록 비용 예측 불가' },
+      { label:'핵심 기능 Add-on', desc:'Fraud·Raw data 별도 비용 발생' },
+    ], true, { ih:0.88, fs:12, tc:MUT });
   }
 
-  // ──────────────────────────────────
-  // SLIDE 5 — 도입 사례
-  // ──────────────────────────────────
+  // ── S5 도입 사례 ──
   const s5 = pptx.addSlide();
   base(s5, '도입 사례');
-  mainTitle(s5, `${vertical} 버티컬 에어브릿지 활용 사례`);
+  title(s5, `${vertical} 버티컬 에어브릿지 활용 사례`);
 
-  const migSnippet = migratedList.length > 0
-    ? { label:`${vertical} 이관 고객사`, desc: migratedList.slice(0,10).join(', ') + (migratedList.length>10 ? ' 외' : '') }
-    : null;
+  function caseItem(c) {
+    return { label:c.co, desc:(c.before ? `도입 전: ${c.before}\n→ ${c.result}` : c.result) };
+  }
+  const migSnip = migratedList.length > 0 ? { label:`${vertical} 이관 고객사 ${migratedList.length}개사`, desc: migratedList.slice(0,10).join('  ·  ') + (migratedList.length>10?' 외':'') } : null;
+  const fallback = [
+    { label:'300개+ 국내 고객사', desc:'국내 앱 서비스 중 가장 많은 레퍼런스' },
+    { label:'350개+ 매체 연동', desc:'국내·글로벌 광고 매체 원스톱 연결' },
+    { label:'ISMS 인증 완료', desc:'보안·규정 준수 최우선 운영' },
+  ];
 
   if(cases.length >= 2) {
-    addCard(s5, CARD_L);
-    addCard(s5, CARD_R);
-    addItems(s5, CARD_L, cases.slice(0,2).map(c => ({ label:c.co, desc:`${c.goal} · ${c.result}` })), false, { itemH:1.45, fSize:13, tColor:WHITE_C });
-    const rightItems = cases.slice(2,4).map(c => ({ label:c.co, desc:`${c.goal} · ${c.result}` }));
-    if(rightItems.length < 2 && migSnippet) rightItems.push(migSnippet);
-    if(rightItems.length > 0) {
-      addItems(s5, CARD_R, rightItems, false, { itemH:1.45, fSize:13, tColor:WHITE_C });
-    } else if(migSnippet) {
-      addItems(s5, CARD_R, [migSnippet], false, { itemH:1.45, fSize:13, tColor:WHITE_C });
-    }
+    card(s5, CL); card(s5, CR);
+    cardTitle(s5, CL, '활용 사례');
+    cardTitle(s5, CR, cases.length > 2 ? '활용 사례' : (migSnip ? '이관 고객사' : ''));
+    items(s5, CL, cases.slice(0,2).map(caseItem), true, { ih:1.28, fs:12, tc:WHT });
+    const rItems = cases.slice(2,4).map(caseItem);
+    if(rItems.length < 2 && migSnip) rItems.push(migSnip);
+    if(rItems.length > 0) items(s5, CR, rItems, true, { ih:1.28, fs:12, tc:WHT });
   } else if(cases.length === 1) {
-    addCard(s5, CARD1);
-    const items5 = [{ label:cases[0].co, desc:`${cases[0].goal} · ${cases[0].result}` }];
-    if(migSnippet) items5.push(migSnippet);
-    addItems(s5, CARD1, items5, false, { itemH:1.4, fSize:13, tColor:WHITE_C });
+    card(s5, CL); card(s5, CR);
+    cardTitle(s5, CL, '활용 사례');
+    cardTitle(s5, CR, migSnip ? '이관 고객사' : '에어브릿지 지표');
+    items(s5, CL, [caseItem(cases[0])], true, { ih:1.28, fs:12, tc:WHT });
+    items(s5, CR, migSnip ? [migSnip] : fallback, true, { ih:migSnip ? 1.28 : 0.88, fs:12, tc:WHT });
   } else {
-    addCard(s5, CARD1);
-    if(migSnippet) {
-      addItems(s5, CARD1, [migSnippet], false, { itemH:1.4, fSize:13, tColor:WHITE_C });
-    } else {
-      s5.addText('해당 버티컬 사례는 별도 문의 주시면 안내 드립니다.', {
-        x:CARD1.x+0.22, y:CARD1.y+1.4, w:CARD1.w-0.44, h:0.5,
-        fontSize:14, color:MUTED_C, fontFace:F, align:'center',
-      });
-    }
+    card(s5, CL); card(s5, CR);
+    cardTitle(s5, CL, migSnip ? '이관 고객사' : '에어브릿지 지표');
+    cardTitle(s5, CR, '에어브릿지 지표');
+    if(migSnip) items(s5, CL, [migSnip], true, { ih:1.28, fs:12, tc:WHT });
+    else items(s5, CL, fallback, true, { ih:0.88, fs:12, tc:WHT });
+    items(s5, CR, fallback, true, { ih:0.88, fs:12, tc:WHT });
   }
 
-  // ──────────────────────────────────
-  // SLIDE 6 — 도입 프로세스 & 가격
-  // ──────────────────────────────────
+  // ── S6 도입 프로세스 & 가격 ──
   const s6 = pptx.addSlide();
   base(s6, '도입 프로세스 & 가격');
-  mainTitle(s6, '에어브릿지 도입 여정');
+  title(s6, '에어브릿지 도입 여정');
+  card(s6, CL); card(s6, CR);
+  cardTitle(s6, CL, '도입 프로세스');
+  cardTitle(s6, CR, showPrice ? '예상 요금' : '요금 안내');
 
-  addCard(s6, CARD_L);
-  addCard(s6, CARD_R);
-  addCardTitle(s6, CARD_L, '도입 프로세스');
-  addCardTitle(s6, CARD_R, '예상 요금');
-
-  addItems(s6, CARD_L, [
-    { label:'1.  무료 컨설팅  (1\u20132주)', desc:'현황 분석 & 도입 범위 확정' },
+  items(s6, CL, [
+    { label:'1.  무료 컨설팅  (1–2주)', desc:'현황 분석 & 도입 범위 확정' },
     { label:'2.  정식 계약', desc:'연간 계약 체결 & 전담 CSM 배정' },
-    { label:'3.  SDK 연동 지원  (2\u20134주)', desc:'테스트 환경 + 연동 가이드 + 개발 지원' },
-    { label:'4.  파일럿 운영  (2\u20134주)', desc:'실제 캠페인 데이터 수집 & 대시보드 세팅' },
-  ], true, { itemH:0.65, fSize:11, tColor:WHITE_C });
+    { label:'3.  SDK 연동 지원  (2–4주)', desc:'테스트 환경 + 연동 가이드 + 개발 지원' },
+    { label:'4.  파일럿 운영  (2–4주)', desc:'실제 캠페인 데이터 수집 & 대시보드 세팅' },
+  ], true, { ih:0.65, fs:11, tc:WHT });
 
-  s6.addText(`${clientName} (${mau} MAU 기준)`, {
-    x:CARD_R.x+0.22, y:CARD_R.y+0.65, w:CARD_R.w-0.44, h:0.28,
-    fontSize:10, color:MUTED_C, fontFace:F,
-  });
-  s6.addText(mauPrice, {
-    x:CARD_R.x+0.22, y:CARD_R.y+0.97, w:CARD_R.w-0.44, h:0.72,
-    fontSize:32, bold:true, color:ACCENT, fontFace:F,
-  });
-  const pNote = mau === '10만+' ? '10만 MAU 이상은 규모에 따라 맞춤 견적 제공' : 'All-inclusive \u2014 추가 비용 없음';
-  s6.addText(pNote, {
-    x:CARD_R.x+0.22, y:CARD_R.y+1.75, w:CARD_R.w-0.44, h:0.38,
-    fontSize:11, color:WHITE_C, fontFace:F, wrap:true,
-  });
-  [
-    '· Fraud 방지 · Raw data · 오디언스 매니저',
-    '· 네이버·카카오 키워드 연동 · 한국어 CS',
-    '· 딥링크 · Predictive LTV · API 연동',
-  ].forEach((line, i) => {
-    s6.addText(line, {
-      x:CARD_R.x+0.22, y:CARD_R.y+2.2+i*0.33, w:CARD_R.w-0.44, h:0.3,
-      fontSize:10, color:MUTED_C, fontFace:F,
+  if(type==='이관') {
+    s6.addText('* 기존 MMP 병행 운영(약 2주) 지원 — 데이터 공백 없이 전환 가능', {
+      x:CL.x+0.22, y:CL.y+3.05, w:CL.w-0.44, h:0.26, fontSize:9, color:ACC+'BB', fontFace:F, wrap:true,
     });
-  });
-
-  // ──────────────────────────────────
-  // SLIDE 7 — 문의
-  // ──────────────────────────────────
-  const s7 = pptx.addSlide();
-  base(s7, '문의');
-  mainTitle(s7, '에어브릿지 전문 인력과\n직접 만나보세요');
-  subLine(s7, '무료 컨설팅부터 기술 데모까지 \u2014 도입 전 궁금한 점을 모두 해소해드립니다.');
-
-  const cH = agencyName ? 1.65 : 2.0;
-  addCard(s7, { x:0.35, y:1.88, w:9.3, h:cH });
-
-  s7.addText('AIRBRIDGE BDM', { x:0.57, y:2.05, w:5, h:0.24, fontSize:9, bold:true, color:MUTED_C, fontFace:F });
-  s7.addText('이진성', { x:0.57, y:2.3, w:2.4, h:0.44, fontSize:22, bold:true, color:WHITE_C, fontFace:F });
-
-  // AB180 badge
-  s7.addShape('rect', { x:2.83, y:2.36, w:0.9, h:0.28, fill:{ color:ACCENT }, line:{ color:ACCENT, width:0 } });
-  s7.addText('AB180', { x:2.83, y:2.36, w:0.9, h:0.28, fontSize:9, bold:true, color:WHITE_C, fontFace:F, align:'center', valign:'middle' });
-
-  s7.addText('jinsung@ab180.co', { x:0.57, y:2.8, w:5, h:0.34, fontSize:15, color:MUTED_C, fontFace:F });
-
-  if(agencyName) {
-    addCard(s7, { x:0.35, y:3.63, w:9.3, h:1.3 });
-    s7.addText('에이전시', { x:0.57, y:3.77, w:4, h:0.22, fontSize:9, bold:true, color:MUTED_C, fontFace:F });
-    s7.addText(agencyName, { x:0.57, y:4.01, w:8.9, h:0.5, fontSize:20, bold:true, color:WHITE_C, fontFace:F });
   }
 
-  s7.addText(`제안일: ${dateStr} · 본 제안서의 가격 정보는 정가 기준이며, 계약 조건에 따라 변동될 수 있습니다.`, {
-    x:0.35, y:5.1, w:9.3, h:0.24, fontSize:9, color:MUTED_C, fontFace:F,
+  if(showPrice) {
+    s6.addText(`${clientName} (${mau} MAU 기준)`, { x:CR.x+0.22, y:CR.y+0.65, w:CR.w-0.44, h:0.28, fontSize:10, color:MUT, fontFace:F });
+    s6.addText(mauPrice, { x:CR.x+0.22, y:CR.y+0.95, w:CR.w-0.44, h:0.72, fontSize:32, bold:true, color:ACC, fontFace:F });
+    const roiLine = mau==='10만+' ? '10만 MAU 이상은 규모에 따라 맞춤 견적 제공' : 'AppsFlyer 동등 구성 대비 약 30% 절감 · All-inclusive';
+    s6.addText(roiLine, { x:CR.x+0.22, y:CR.y+1.72, w:CR.w-0.44, h:0.36, fontSize:10, color:ACC+'BB', fontFace:F, wrap:true });
+  } else {
+    s6.addText('맞춤 견적 제공', { x:CR.x+0.22, y:CR.y+0.95, w:CR.w-0.44, h:0.65, fontSize:22, bold:true, color:WHT, fontFace:F });
+    s6.addText('MAU 규모·도입 범위에 따라 최적화된 견적을 제안드립니다.', { x:CR.x+0.22, y:CR.y+1.65, w:CR.w-0.44, h:0.48, fontSize:11, color:MUT, fontFace:F, wrap:true });
+  }
+  ['· Fraud 방지 · Raw data · 오디언스 매니저','· 네이버·카카오 키워드 연동 · 한국어 CS','· 딥링크 · Predictive LTV · API 연동'].forEach((ln, i) => {
+    s6.addText(ln, { x:CR.x+0.22, y:CR.y+2.22+i*0.34, w:CR.w-0.44, h:0.30, fontSize:10, color:MUT, fontFace:F });
   });
 
-  // ── Download ──
+  // ── S7 문의 ──
+  const s7 = pptx.addSlide();
+  base(s7, '문의');
+  title(s7, '에어브릿지 도입 문의');
+  sub(s7, '무료 컨설팅부터 기술 데모까지 — 도입 전 궁금한 점을 모두 해소해드립니다.');
+
+  // AE card (primary)
+  s7.addShape('rect', { x:0.35, y:1.90, w:9.3, h:1.55, fill:{ color:CARD_C }, line:{ color:CARD_C, width:0 } });
+  s7.addText((agencyName ? agencyName+' · ' : '')+'담당 AE', { x:0.57, y:2.06, w:7, h:0.22, fontSize:9, bold:true, color:ACC, fontFace:F });
+  s7.addText(aeName, { x:0.57, y:2.30, w:5, h:0.44, fontSize:22, bold:true, color:WHT, fontFace:F });
+  s7.addText(aeContact, { x:0.57, y:2.77, w:8.6, h:0.34, fontSize:14, color:MUT, fontFace:F });
+
+  // BDM card (secondary)
+  s7.addShape('rect', { x:0.35, y:3.58, w:9.3, h:1.28, fill:{ color:CARD_C }, line:{ color:CARD_C, width:0 } });
+  s7.addText('에어브릿지 BDM', { x:0.57, y:3.72, w:5, h:0.22, fontSize:9, bold:true, color:MUT, fontFace:F });
+  s7.addText('이진성', { x:0.57, y:3.96, w:1.8, h:0.36, fontSize:16, bold:true, color:WHT, fontFace:F });
+  s7.addShape('rect', { x:2.55, y:4.00, w:0.75, h:0.24, fill:{ color:ACC }, line:{ color:ACC, width:0 } });
+  s7.addText('AB180', { x:2.55, y:4.00, w:0.75, h:0.24, fontSize:8, bold:true, color:WHT, fontFace:F, align:'center', valign:'middle' });
+  s7.addText('jinsung@ab180.co', { x:0.57, y:4.38, w:5, h:0.30, fontSize:13, color:MUT, fontFace:F });
+
+  s7.addText(`제안일: ${dateStr} · 본 제안서의 가격 정보는 정가 기준이며, 계약 조건에 따라 변동될 수 있습니다.`, {
+    x:0.35, y:5.10, w:9.3, h:0.24, fontSize:9, color:MUT, fontFace:F,
+  });
+
   await pptx.writeFile({ fileName:`에어브릿지_제안서_${clientName}.pptx` });
 }
 </script>
