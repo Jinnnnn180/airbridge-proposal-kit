@@ -622,7 +622,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     const sc=pptx.addSlide();
     base(sc,`0${6+idx}  도입 사례 ${idx+1}${total>1?'/'+total:''}`);
     ttl(sc,`${c.co}  —  에어브릿지 도입 사례`);
-    sc.addShape('rect',{x:3.8,y:1.30,w:2.4,h:0.26,fill:{color:ACC+'33'},line:{color:ACC,.width:.8}});
+    sc.addShape('rect',{x:3.8,y:1.30,w:2.4,h:0.26,fill:{color:ACC+'33'},line:{color:ACC,width:0.8}});
     sc.addText(`${vm} 버티컬  ·  ${type==='이관'?currentMMP||'타 MMP 이관':'신규 도입'}`,{x:3.8,y:1.30,w:2.4,h:0.26,fontSize:9,bold:true,color:ACC,fontFace:F,align:'center',valign:'middle'});
     caseCol(sc,CC1,RED,'도입 전 상황','AS-IS 문제',c.before||'');
     caseCol(sc,CC2,ACC,'에어브릿지 솔루션','도입한 기능·방법',c.solution||'에어브릿지 어트리뷰션 도입으로 정확한 성과 측정 체계 구축');
