@@ -394,13 +394,13 @@ const MEDIA_MENU = [
 
 const PAIN_MENU = [
   { id:'budget',   label:'예산 배분 근거 부족',
-    line:'매체별 리포트를 합산해 예산을 배분 중 — 중복 기여로 실제 성과를 만든 매체를 특정할 수 없음',
+    line:'매체별 리포트를 합산해 예산을 배분 중 · 중복 기여로 실제 성과를 만든 매체를 특정할 수 없음',
     comp:['통합 대시보드','기여'] },
   { id:'kr_media', label:'네이버·카카오 성과 미집계',
     line:'네이버·카카오 검색광고의 비용·키워드 데이터가 연동되지 않아 국내 주력 매체의 ROAS를 볼 수 없음',
     comp:['키워드','검색광고'] },
   { id:'webtoapp', label:'웹→앱 전환 추적 불가',
-    line:'웹 광고로 유입된 유저가 앱에서 무엇을 하는지 끊겨 있음 — 웹투앱 전환 여정 측정 불가',
+    line:'웹 광고로 유입된 유저가 앱에서 무엇을 하는지 끊겨 있음 · 웹투앱 전환 여정 측정 불가',
     comp:['웹투앱'] },
   { id:'fraud',    label:'광고사기 · 중복 기여',
     line:'클릭 위조·중복 기여를 걸러내지 못해 광고비의 일부가 무효 트래픽으로 새고 있음',
@@ -438,7 +438,7 @@ function renderChips() {
     return `<button type="button" id="chip-pain-${p.id}" class="chip${dim?' dim':''}" aria-pressed="${on}"${dim?' aria-disabled="true"':''} onclick="togglePain('${p.id}')">${p.label}</button>`;
   }).join('');
   document.getElementById('painCounter').textContent =
-    `${selPain.size} / 3 선택 — 선택한 항목이 제안서 1번 슬라이드 맨 위와 경쟁사 비교표 상단으로 올라갑니다`;
+    `${selPain.size} / 3 선택 · 선택한 항목이 제안서 1번 슬라이드 맨 위와 경쟁사 비교표 상단으로 올라갑니다`;
 }
 function toggleMedia(id) {
   if(selMedia.has(id)) selMedia.delete(id); else selMedia.add(id);
@@ -464,7 +464,7 @@ function renderCases() {
   }).join('');
   document.getElementById('caseCounter').textContent = selCase.size === 0
     ? `선택하지 않으면 ${list.length}개 사례가 모두 들어갑니다. 광고주와 가장 닮은 1~3개를 고르세요.`
-    : `${selCase.size}개 선택됨 — 선택한 사례만 슬라이드로 생성됩니다`;
+    : `${selCase.size}개 선택됨 · 선택한 사례만 슬라이드로 생성됩니다`;
 }
 function toggleCase(i) {
   if(selCase.has(i)) selCase.delete(i);
@@ -548,10 +548,10 @@ function validate() {
 // PAIN POINTS
 // ──────────────────────────────────────────────
 function getPainPoints(mmp) {
-  if(mmp==='AppsFlyer') return ['Fraud·Raw data·Organic 데이터 모두 Add-on — 기본 기능에 별도 비용 발생','네이버·카카오 검색광고 비용 연동 불가 — 국내 주요 매체 ROAS 파악 어려움','설치(Install) 기반 과금 — 캠페인 성과 좋을수록 비용 예측 불가','해외 서버 데이터 저장 — 개인정보보호법·ISMS 리스크','한국어 지원 부재 — 이슈 발생 시 대응 속도 저하'];
-  if(mmp==='Adjust') return ['네이버·카카오 검색광고 키워드 데이터 미지원 — 국내 매체 ROAS 측정 한계','전환 수 기반 과금 — 캠페인 증가 시 비용 예측 불가','Predictive LTV는 SKAdNetwork 한정만 지원','웹투앱 트래킹이 정적·파편화 — 웹 유입→앱 전환 여정 분석 어려움','한국어 지원 부재 — 이슈 대응 속도 저하'];
-  if(mmp==='Dfinery') return ['Meta·Google 비공식 추적 — 광고 계정 정지·폐쇄 리스크','기여 분석 결과가 설정에 따라 변동 — 데이터 신뢰도 저하','View-through 측정 불가 — UTM 기반 한계','매체 알고리즘 최적화 제약 — 마케팅 예산 효율 저하','한국어 전담 지원 부재 — 이슈 대응 지연'];
-  return ['해외 서버 데이터 저장 — 개인정보보호법·ISMS 리스크','국내 매체 연동 한계 — 네이버·카카오 키워드 데이터 미지원','전환/설치 기반 과금 — 예산 예측 어려움','한국어 지원 부재 — 이슈 대응 지연'];
+  if(mmp==='AppsFlyer') return ['Fraud·Raw data·Organic 데이터 모두 Add-on · 기본 기능에 별도 비용 발생','네이버·카카오 검색광고 비용 연동 불가 · 국내 주요 매체 ROAS 파악 어려움','설치(Install) 기반 과금 · 캠페인 성과 좋을수록 비용 예측 불가','해외 서버 데이터 저장 · 개인정보보호법·ISMS 리스크','한국어 지원 부재 · 이슈 발생 시 대응 속도 저하'];
+  if(mmp==='Adjust') return ['네이버·카카오 검색광고 키워드 데이터 미지원 · 국내 매체 ROAS 측정 한계','전환 수 기반 과금 · 캠페인 증가 시 비용 예측 불가','Predictive LTV는 SKAdNetwork 한정만 지원','웹투앱 트래킹이 정적·파편화 · 웹 유입→앱 전환 여정 분석 어려움','한국어 지원 부재 · 이슈 대응 속도 저하'];
+  if(mmp==='Dfinery') return ['Meta·Google 비공식 추적 · 광고 계정 정지·폐쇄 리스크','기여 분석 결과가 설정에 따라 변동 · 데이터 신뢰도 저하','View-through 측정 불가 · UTM 기반 한계','매체 알고리즘 최적화 제약 · 마케팅 예산 효율 저하','한국어 전담 지원 부재 · 이슈 대응 지연'];
+  return ['해외 서버 데이터 저장 · 개인정보보호법·ISMS 리스크','국내 매체 연동 한계 · 네이버·카카오 키워드 데이터 미지원','전환/설치 기반 과금 · 예산 예측 어려움','한국어 지원 부재 · 이슈 대응 지연'];
 }
 function getNewPainPoints() {
   return ['어떤 매체가 실제 앱 설치·구매를 만드는지 알 수 없음','매체 리포트 합산 → 중복 기여·광고 사기 피해 가능','앱 링크 클릭 후 앱이 열리지 않거나 처음부터 재시작되는 문제','ROAS 집계 불가 → 예산 배분 최적화 불가','웹 광고 → 앱 전환 여정 추적 불가'];
@@ -606,7 +606,7 @@ async function generate(format) {
 }
 
 // ──────────────────────────────────────────────
-// 조사 자동 판별 — 광고주명이 표지·본문에 들어가므로 필수
+// 조사 자동 판별 · 광고주명이 표지·본문에 들어가므로 필수
 // ──────────────────────────────────────────────
 // 알파벳·숫자는 읽는 소리 기준 (L→엘, N→엔, M→엠 … 은 받침 있음)
 const BATCHIM_ALPHA=new Set(['L','M','N','R','7','9','0','1','3','6','8']);
@@ -623,13 +623,13 @@ const josaEulReul = s => hasBatchim(s) ? '을' : '를';
 // ──────────────────────────────────────────────
 async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,mauPrice,type,currentMMP,cases,migratedList,compRows,font,showPrice,outputFormat,fileName,clientQuote='',media=[],pains=[]}) {
   const pptx=new PptxGenJS();
-  pptx.layout='LAYOUT_16x9'; pptx.title=`Airbridge 제안서 — ${clientName}`; pptx.author=agencyName||'Airbridge';
+  pptx.layout='LAYOUT_16x9'; pptx.title=`Airbridge 제안서 · ${clientName}`; pptx.author=agencyName||'Airbridge';
   const today=new Date();
   const dateStr=`${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
 
   // ── 1층: 원시값 (primitive) ──
   // 팔레트는 네이비·블루·그레이·화이트 4계열로 고정. 강조색은 파랑 하나뿐이다.
-  // 의미(도입 전/후, 문제/해결)는 색상이 아니라 명도로 표현한다 — 색맹 사용자도 읽을 수 있다.
+  // 의미(도입 전/후, 문제/해결)는 색상이 아니라 명도로 표현한다 · 색맹 사용자도 읽을 수 있다.
   const BG='161B2E', CARD_C='1E2438', CARD_A='243050';
   // 다크 배경(#161B2E) 대비 4.5:1 이상을 만족하도록 밝힌 값 (WCAG AA)
   const WHT='FFFFFF', MUT='9AA5B8', DIM='818EA9', CPY='76859B';
@@ -637,6 +637,59 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
 
   // ── 타입 스케일: 6단계 고정 (덱 전체에서 이 값만 쓴다) ──
   const T = { caption:9, body:11, lead:13, stat:18, title:28, display:44 };
+
+  // ── 한글 줄바꿈 제어 ──────────────────────────────────────────
+  // PowerPoint는 한글을 어절이 아니라 글자 단위로 끊는다 ("안녕하세/요").
+  // 표준 속성 eaLnBrk로 끌 수 있지만 pptxgenjs가 노출하지 않는다.
+  // → 글자 폭을 직접 계산해 어절 경계에 \n 을 넣어, PowerPoint가 다시 끊을 일이 없게 만든다.
+  const emW = ch => {
+    const c = ch.codePointAt(0);
+    if (ch === ' ') return 0.30;
+    if ((c>=0xAC00&&c<=0xD7A3) || (c>=0x3000&&c<=0x30FF) || (c>=0x4E00&&c<=0x9FFF)) return 1.0; // 한글·한자·가나
+    if ('·—–→✔✖★'.includes(ch)) return 0.60;
+    if (ch>='A'&&ch<='Z') return 0.66;
+    if (ch>='a'&&ch<='z') return 0.52;
+    if (ch>='0'&&ch<='9') return 0.55;
+    return 0.40;
+  };
+  const textW = (s, pt) => [...s].reduce((a,c)=>a+emW(c), 0) * pt / 72;   // 인치
+
+  /**
+   * 폭(인치) 안에 들어가도록 어절 경계에서 줄을 나눈다.
+   * 탐욕적으로 채우면 마지막 어절이 혼자 넘어간다("… 광고 낭비 / 발생").
+   * → 필요한 줄 수를 먼저 구하고 그 수로 균등하게 나눠 외톨이 줄을 없앤다.
+   */
+  function wrapKo(text, maxW, pt) {
+    const LIM = maxW * 0.97;
+    const greedy = (toks, lim) => {
+      const out = []; let cur = '';
+      for (const tok of toks) {
+        const cand = cur ? cur + ' ' + tok : tok;
+        if (textW(cand, pt) <= lim) { cur = cand; continue; }
+        if (cur) out.push(cur);
+        if (textW(tok, pt) > lim) {          // 한 어절이 상자보다 길면 어쩔 수 없이 글자 단위
+          let piece = '';
+          for (const ch of tok) {
+            if (textW(piece + ch, pt) > lim) { out.push(piece); piece = ch; }
+            else piece += ch;
+          }
+          cur = piece;
+        } else cur = tok;
+      }
+      if (cur) out.push(cur);
+      return out;
+    };
+    return String(text).split('\n').map(line => {
+      const total = textW(line, pt);
+      if (total <= LIM) return line;
+      const toks = line.split(' ');
+      const n = Math.ceil(total / LIM);                 // 최소 줄 수
+      const target = Math.min(LIM, (total / n) * 1.08); // 균등 목표 폭
+      let lines = greedy(toks, target);
+      if (lines.length > n) lines = greedy(toks, LIM);  // 목표가 빡빡하면 원래 폭으로
+      return lines.join('\n');
+    }).join('\n');
+  }
 
   // PPTX는 6자리 hex만 받는다. 8자리(#RRGGBBAA)를 주면 조용히 검정으로 폴백된다.
   // 투명도는 배경과 미리 섞어 6자리로 확정한다 → 뷰어마다 동일하게 렌더되고 대비 계산도 가능하다.
@@ -655,10 +708,10 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   const ACC_LINE   = mix(ACC, BG,     0.55);  // 타임라인 연결선
   const ACC_BAR    = mix(ACC, BG,     0.55);  // 구분 바
   // 텍스트용 강조색은 배경이 아니라 흰색과 섞어 밝힌다 (어두운 배경과 섞으면 대비가 더 나빠진다)
-  const ACC_ON     = mix(WHT, ACC,    0.15);  // 다크 배경 위 강조 텍스트 — 4.5:1 확보
+  const ACC_ON     = mix(WHT, ACC,    0.15);  // 다크 배경 위 강조 텍스트 · 4.5:1 확보
   const DIVIDER    = mix(MUT, BG,     0.27);  // 표지 구분선
   const HAIRLINE   = mix(WHT, CARD_C, 0.09);  // 리스트 항목 사이 얇은 선
-  const NEG_HEAD   = mix(MUT, BG,     0.35);  // "문제 상황" 표 헤더 — 빨강 대신 가라앉은 회색
+  const NEG_HEAD   = mix(MUT, BG,     0.35);  // "문제 상황" 표 헤더 · 빨강 대신 가라앉은 회색
 
   const CL={x:0.35,y:1.85,w:4.5,h:3.38}, CR={x:5.15,y:1.85,w:4.5,h:3.38}, C1={x:0.35,y:1.85,w:9.3,h:3.38};
   const G=[{x:0.35,y:1.85,w:4.5,h:1.30},{x:5.15,y:1.85,w:4.5,h:1.30},{x:0.35,y:3.27,w:4.5,h:1.30},{x:5.15,y:3.27,w:4.5,h:1.30}];
@@ -670,8 +723,17 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     slide.addText('Airbridge',{x:8.35,y:0.09,w:1.6,h:0.3,fontSize:11,bold:true,color:WHT,fontFace:F,align:'right'});
     slide.addText('Copyright ©Airbridge 2026. All rights reserved.',{x:0.35,y:5.38,w:9.3,h:0.2,fontSize:9,color:CPY,fontFace:F});
   }
-  function ttl(slide,text) { slide.addText(text,{x:0.5,y:0.36,w:9,h:0.9,fontSize:28,bold:true,color:WHT,fontFace:F,align:'center',wrap:true}); }
-  function sub(slide,text) { slide.addText(text,{x:1.0,y:1.29,w:8,h:0.52,fontSize:11,color:MUT,fontFace:F,align:'center',wrap:true}); }
+  // 제목은 반드시 한 줄. 상자를 넘치면(긴 광고주·고객사명) 넘치는 만큼만 자동 축소한다.
+  function ttl(slide,text) {
+    const BW=9.0;
+    let pt=T.title;
+    const w=textW(text,pt);
+    if (w > BW*0.98) pt = Math.max(T.stat, Math.floor(pt * BW*0.98 / w));
+    slide.addText(text,{x:0.5,y:0.36,w:BW,h:0.62,fontSize:pt,bold:true,color:WHT,fontFace:F,align:'center',valign:'middle',wrap:false});
+  }
+  function sub(slide,text) {
+    slide.addText(wrapKo(text,8.0,T.body),{x:1.0,y:1.24,w:8,h:0.56,fontSize:T.body,color:MUT,fontFace:F,align:'center',wrap:true,lineSpacingMultiple:1.30});
+  }
   function card(slide,pos) { slide.addShape('rect',{x:pos.x,y:pos.y,w:pos.w,h:pos.h,fill:{color:CARD_C},line:{color:CARD_C,width:0}}); }
   function cardTitle(slide,pos,text) { slide.addText(text,{x:pos.x+0.22,y:pos.y+0.16,w:pos.w-0.44,h:0.34,fontSize:13,bold:true,color:ACC_ON,fontFace:F}); }
   function items(slide,pos,list,hasTitle,opts) {
@@ -679,9 +741,12 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     const sx=pos.x+0.22,sw=pos.w-0.44,sy=pos.y+(hasTitle?0.60:0.22);
     list.forEach((item,i)=>{
       const iy=sy+i*ih;
-      if(typeof item==='string') slide.addText('▸  '+item,{x:sx,y:iy,w:sw,h:ih*.86,fontSize:fs,color:tc,fontFace:F,wrap:true,valign:'middle'});
+      if(typeof item==='string') slide.addText(wrapKo('▸  '+item,sw,fs),{x:sx,y:iy,w:sw,h:ih*.86,fontSize:fs,color:tc,fontFace:F,wrap:true,valign:'middle',lineSpacingMultiple:1.25});
       // 스케일 밖 값이 생기지 않도록 fs±1 대신 명시적 단계를 쓴다
-      else { slide.addText(item.label,{x:sx,y:iy,w:sw,h:ih*.42,fontSize:T.lead,bold:true,color:tc,fontFace:F}); if(item.desc)slide.addText(item.desc,{x:sx,y:iy+ih*.44,w:sw,h:ih*.52,fontSize:T.body,color:dc,fontFace:F,wrap:true}); }
+      else {
+        slide.addText(wrapKo(item.label,sw,T.lead),{x:sx,y:iy,w:sw,h:ih*.40,fontSize:T.lead,bold:true,color:tc,fontFace:F});
+        if(item.desc) slide.addText(wrapKo(item.desc,sw,T.body),{x:sx,y:iy+ih*.48,w:sw,h:ih*.50,fontSize:T.body,color:dc,fontFace:F,wrap:true,lineSpacingMultiple:1.30});
+      }
     });
   }
   function miniCard(slide,pos,tag,titleTxt,desc) {
@@ -697,8 +762,9 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     slide.addShape('rect',{x:pos.x,y:pos.y,w:pos.w,h:0.045,fill:{color:badgeColor},line:{color:badgeColor,width:0}});
     slide.addShape('rect',{x:pos.x+0.16,y:pos.y+0.10,w:pos.w-0.32,h:0.26,fill:{color:mix(badgeColor,CARD_C,0.20)},line:{color:badgeColor,width:0.6}});
     slide.addText(badgeTxt,{x:pos.x+0.16,y:pos.y+0.10,w:pos.w-0.32,h:0.26,fontSize:9,bold:true,color:mix(WHT,badgeColor,0.15),fontFace:F,align:'center',valign:'middle'});
-    if(heading) slide.addText(heading,{x:pos.x+0.16,y:pos.y+0.44,w:pos.w-0.32,h:0.30,fontSize:11,bold:true,color:WHT,fontFace:F});
-    slide.addText(body,{x:pos.x+0.16,y:pos.y+(heading?0.76:0.44),w:pos.w-0.32,h:pos.h-(heading?0.90:0.58),fontSize:11,color:MUT,fontFace:F,wrap:true,valign:'top'});
+    const cw=pos.w-0.24;   // 좁은 컬럼이라 좌우 여백을 줄여 본문 폭을 확보
+    if(heading) slide.addText(heading,{x:pos.x+0.12,y:pos.y+0.46,w:cw,h:0.30,fontSize:T.body,bold:true,color:WHT,fontFace:F});
+    slide.addText(wrapKo(body,cw,T.body),{x:pos.x+0.12,y:pos.y+(heading?0.82:0.48),w:cw,h:pos.h-(heading?0.96:0.62),fontSize:T.body,color:MUT,fontFace:F,wrap:true,valign:'top',lineSpacingMultiple:1.35});
   }
 
   // ── S0 표지 ──
@@ -716,14 +782,14 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   if(clientQuote) s0.addText(`“${clientQuote}”`,{x:0.35,y:4.66,w:9.3,h:0.52,fontSize:11,italic:true,color:ACC_ON,fontFace:F,valign:'middle',wrap:true});
   s0.addText('Copyright ©Airbridge 2026. All rights reserved.',{x:0.35,y:5.38,w:9.3,h:0.2,fontSize:9,color:CPY,fontFace:F});
 
-  // ── S1 현황 진단 — 체크리스트 ──
+  // ── S1 현황 진단 · 체크리스트 ──
   const s1=pptx.addSlide(); base(s1,'01  광고주 현황 진단');
   ttl(s1,'지금 이런 상황이신가요?');
   const bColor=ACC;   // 이관/신규 구분은 색이 아니라 배지 문구로 한다
   const BADGE_BG=mix(bColor,BG,0.20), BANNER_BG=mix(bColor,CARD_C,0.20);
   s1.addShape('rect',{x:3.0,y:1.30,w:4.0,h:0.28,fill:{color:BADGE_BG},line:{color:bColor,width:.8}});
-  s1.addText(type==='이관'?`CASE B — ${currentMMP||'타 MMP'} 이관 검토`:'CASE A — MMP 신규 도입',{x:3.0,y:1.30,w:4.0,h:0.28,fontSize:11,bold:true,color:ACC_ON,fontFace:F,align:'center',valign:'middle'});
-  // 광고주 상황 컨텍스트 줄 — 인용문 우선, 없으면 집행 매체
+  s1.addText(type==='이관'?`CASE B · ${currentMMP||'타 MMP'} 이관 검토`:'CASE A · MMP 신규 도입',{x:3.0,y:1.30,w:4.0,h:0.28,fontSize:T.body,bold:true,color:ACC_ON,fontFace:F,align:'center',valign:'middle'});
+  // 광고주 상황 컨텍스트 줄 · 인용문 우선, 없으면 집행 매체
   const mediaLabels=media.map(m=>m.label).join(' · ');
   const hasKR=media.some(m=>m.id==='naver'||m.id==='kakao');
   const ctxLine=clientQuote ? `“${clientQuote}”` : (mediaLabels ? `현재 집행 매체 :  ${mediaLabels}` : '');
@@ -744,7 +810,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     const isChosen=i<chosenPP.length;
     s1.addShape('ellipse',{x:P1.x+0.22,y:iy+0.06,w:0.26,h:0.26,fill:{color:isChosen?ACC:ACC_SUBTLE},line:{color:isChosen?ACC:DIM,width:.6}});
     s1.addText(`${i+1}`,{x:P1.x+0.22,y:iy+0.06,w:0.26,h:0.26,fontSize:9,bold:true,color:WHT,fontFace:F,align:'center',valign:'middle'});
-    s1.addText(item,{x:P1.x+0.60,y:iy,w:P1.w-0.78,h:itemH*.84,fontSize:11,bold:isChosen,color:isChosen?WHT:MUT,fontFace:F,valign:'middle',wrap:true});
+    s1.addText(wrapKo(item,P1.w-0.78,T.body),{x:P1.x+0.60,y:iy,w:P1.w-0.78,h:itemH*.84,fontSize:T.body,bold:isChosen,color:isChosen?WHT:MUT,fontFace:F,valign:'middle',wrap:true,lineSpacingMultiple:1.25});
     if(i<allPP.length-1) s1.addShape('rect',{x:P1.x+0.22,y:iy+itemH-.01,w:P1.w-0.44,h:0.01,fill:{color:HAIRLINE},line:{color:HAIRLINE,width:0}});
   });
   s1.addShape('rect',{x:P1.x,y:P1.y+P1.h-0.52,w:P1.w,h:0.52,fill:{color:BANNER_BG},line:{color:BANNER_BG,width:0}});
@@ -753,10 +819,10 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     ? `발표 포인트: 상단 ${chosenPP.length}개는 광고주가 직접 말한 고민입니다. 그대로 되짚으며 "이 부분이 가장 크신 게 맞나요?"로 확인 후 대화를 엽니다.`
     : '발표 포인트: 체크리스트 하나씩 읽으며 광고주 공감 유도 → "몇 개나 해당되세요?" 질문으로 대화 오픈');
 
-  // ── S2 MMP란? — 5:5 비교 표 ──
+  // ── S2 MMP란? · 5:5 비교 표 ──
   const s2=pptx.addSlide(); base(s2,'02  MMP란?');
-  ttl(s2,'MMP(Mobile Measurement Partner)가 필요한 이유');
-  sub(s2,'MMP는 모든 광고 채널의 앱 성과를 중립적으로 측정해 어떤 매체가 실제 전환에 기여했는지 파악하는 파트너입니다.');
+  ttl(s2,'MMP가 필요한 이유');
+  sub(s2,'MMP(Mobile Measurement Partner)는 모든 광고 채널의 앱 성과를 중립적으로 측정해 어떤 매체가 실제 전환에 기여했는지 파악하는 파트너입니다.');
   // 비교 표 (addTable)
   const s2hdr=[
     {text:'문제 상황 (MMP 없을 때)',options:{bold:true,color:WHT,fill:{color:NEG_HEAD},fontFace:F,fontSize:11,align:'center',valign:'middle'}},
@@ -778,11 +844,11 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   s2.addTable([s2hdr,...s2rows],{x:0.35,y:1.85,w:9.3,colW:[4.65,4.65],rowH:0.51,border:{type:'solid',color:'2D3748',pt:0.5},fontFace:F,fontSize:11});
   s2.addNotes('핵심 포인트: "지금 보시는 매체 리포트 합산 숫자는 중복 기여가 섞여 있을 가능성이 높습니다."');
 
-  // ── S3 에어브릿지 소개 — 2×2 그리드 ──
+  // ── S3 에어브릿지 소개 · 2×2 그리드 ──
   const s3=pptx.addSlide(); base(s3,'03  에어브릿지 소개');
-  ttl(s3,'국내 매체 연동과 전담 지원을 함께 제공하는 유일한 MMP');
+  ttl(s3,'국내 매체 연동까지 되는 유일한 MMP');
 
-  // 지표 스트립 — 가장 강한 숫자를 문장에서 꺼내 크게 보여준다
+  // 지표 스트립 · 가장 강한 숫자를 문장에서 꺼내 크게 보여준다
   const STATS=[['+47.7%','ARR 연평균 성장률'],['+75.4%','고객사 수 연평균 성장률'],['400+','국내외 고객사']];
   STATS.forEach((st,i)=>{
     const x=0.35+i*2.35;
@@ -795,11 +861,13 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   // ── 균등 2×2 그리드. 위계는 크기가 아니라 카드 상단 강조 라인으로 준다 ──
   const G2=[{x:0.35,y:2.14},{x:5.10,y:2.14},{x:0.35,y:3.58},{x:5.10,y:3.58}].map(p=>({...p,w:4.55,h:1.30}));
   const featCard=(slide,pos,c,lead)=>{
+    const iw=pos.w-0.56;   // 카드 내부 폭
     slide.addShape('rect',{x:pos.x,y:pos.y,w:pos.w,h:pos.h,fill:{color:CARD_C},line:{color:CARD_C,width:0}});
     slide.addShape('rect',{x:pos.x,y:pos.y,w:pos.w,h:0.045,fill:{color:lead?ACC:ACC_EDGE},line:{color:lead?ACC:ACC_EDGE,width:0}});
-    slide.addText(c.tag,{x:pos.x+0.28,y:pos.y+0.16,w:pos.w-0.56,h:0.20,fontSize:T.caption,bold:true,color:lead?ACC_ON:DIM,fontFace:F});
-    slide.addText(c.t,{x:pos.x+0.28,y:pos.y+0.40,w:pos.w-0.56,h:0.28,fontSize:T.lead,bold:true,color:WHT,fontFace:F});
-    slide.addText(c.d,{x:pos.x+0.28,y:pos.y+0.72,w:pos.w-0.56,h:0.44,fontSize:T.body,color:MUT,fontFace:F,wrap:true,lineSpacingMultiple:1.25});
+    // 태그 → 제목 → 설명, 블록 사이를 넉넉히 띄운다
+    slide.addText(c.tag,{x:pos.x+0.28,y:pos.y+0.18,w:iw,h:0.20,fontSize:T.caption,bold:true,color:lead?ACC_ON:DIM,fontFace:F});
+    slide.addText(wrapKo(c.t,iw,T.lead),{x:pos.x+0.28,y:pos.y+0.44,w:iw,h:0.28,fontSize:T.lead,bold:true,color:WHT,fontFace:F});
+    slide.addText(wrapKo(c.d,iw,T.body),{x:pos.x+0.28,y:pos.y+0.80,w:iw,h:0.44,fontSize:T.body,color:MUT,fontFace:F,wrap:true,lineSpacingMultiple:1.35});
   };
   // 고른 고민과 연결된 카드를 첫 칸(좌상단)으로 올리고, 그 카드만 강조한다
   const painIds=pains.map(p=>p.id);
@@ -817,10 +885,10 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   s3.addText('400개+ 고객사      Meta · Google 공식 파트너      ISMS 인증      AWS 서울 리전      설립 2015년',
     {x:0.35,y:5.03,w:9.3,h:0.22,fontSize:T.caption,color:DIM,fontFace:F});
 
-  // ── S4 핵심 기능 — 2×2 그리드 ──
+  // ── S4 핵심 기능 · 2×2 그리드 ──
   // 03번과 동일한 구조 (지표 스트립 → 헤어라인 → 균등 2×2 → 캡션 푸터)
   const s4=pptx.addSlide(); base(s4,'04  핵심 기능');
-  ttl(s4,'타사에서 Add-on으로 과금되는 기능이 모두 기본 포함입니다');
+  ttl(s4,'Add-on 없이 모든 기능 기본 포함');
 
   const FEATS=[['220종','제공 로그 데이터 (타사 대비 1.5배)'],['350개+','SDK 1회 설치로 연동되는 매체'],['200개+','대시보드 메트릭']];
   FEATS.forEach((st,i)=>{
@@ -870,14 +938,14 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     card(s5,CL); card(s5,CR);
     cardTitle(s5,CL,'Airbridge  ✔'); cardTitle(s5,CR,'타 MMP  ✖');
     items(s5,CL,[
-      {label:'국내 매체 키워드 연동',desc:'네이버·카카오 SA/DA 실시간 비용 연동 — MMP 중 유일'},
-      {label:'MAU 기반 예측 가능 요금',desc:'설치·전환 수 과금 없음 — 캠페인 급증 시에도 비용 고정'},
+      {label:'국내 매체 키워드 연동',desc:'네이버·카카오 SA/DA 실시간 비용 연동 · MMP 중 유일'},
+      {label:'MAU 기반 예측 가능 요금',desc:'설치·전환 수 과금 없음 · 캠페인 급증 시에도 비용 고정'},
       {label:'All-inclusive 기본 포함',desc:'Fraud·Raw data·오디언스·LTV 추가 비용 없음'},
       {label:'통합 대시보드',desc:'iOS·Android·Web·SKAN 메트릭 단일 화면 통합'},
     ],true,{ih:.72,fs:11,tc:WHT});
     items(s5,CR,[
-      {label:'국내 매체 연동 미지원',desc:'네이버·카카오 비용 데이터 미연동 — ROAS 파악 불가'},
-      {label:'설치·전환 수 기반 과금',desc:'캠페인 성과 좋을수록 비용 예측 불가 — 스파이크 위험'},
+      {label:'국내 매체 연동 미지원',desc:'네이버·카카오 비용 데이터 미연동 · ROAS 파악 불가'},
+      {label:'설치·전환 수 기반 과금',desc:'캠페인 성과 좋을수록 비용 예측 불가 · 스파이크 위험'},
       {label:'핵심 기능 Add-on',desc:'Fraud·Raw data 별도 비용 → 실제 총비용이 2배 이상'},
       {label:'대시보드 파편화',desc:'iOS·Android·SKAdNetwork 각각 분리 제공'},
     ],true,{ih:.72,fs:11,tc:MUT});
@@ -885,20 +953,21 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
 
   // ── S6... 도입 사례 (1사례 1슬라이드) ──
   const nn=n=>String(n).padStart(2,'0');   // 슬라이드 번호 (사례 4개면 010 → 10)
-  const CC1={x:0.35,y:1.90,w:2.82,h:3.18};
-  const CC2={x:3.54,y:1.90,w:2.82,h:3.18};
-  const CC3={x:6.73,y:1.90,w:2.82,h:3.18};
+  // 3w + 2g = 9.30. 컬럼을 넓혀 어절이 혼자 넘어가는 외톨이 줄을 줄인다.
+  const CC1={x:0.35,y:1.90,w:2.90,h:3.18};
+  const CC2={x:3.55,y:1.90,w:2.90,h:3.18};
+  const CC3={x:6.75,y:1.90,w:2.90,h:3.18};
   const arY=CC1.y+CC1.h/2-0.13;
 
   function makeCaseSlide(c, idx, total, vm) {
     const sc=pptx.addSlide();
     base(sc,`${nn(6+idx)}  도입 사례 ${idx+1}${total>1?'/'+total:''}`);
-    ttl(sc,`${c.co}  —  에어브릿지 도입 사례`);
+    ttl(sc,`${c.co}  ·  도입 사례`);
     sc.addShape('rect',{x:3.55,y:1.30,w:2.9,h:0.26,fill:{color:ACC_SUBTLE},line:{color:ACC,width:0.8}});
     sc.addText(`${vm} 버티컬  ·  ${type==='이관'?`${currentMMP||'타 MMP'}에서 이관`:'신규 도입'}`,{x:3.55,y:1.30,w:2.9,h:0.26,fontSize:9,bold:true,color:ACC_ON,fontFace:F,align:'center',valign:'middle'});
     caseCol(sc,CC1,DIM,'도입 전 상황','AS-IS 문제',c.before||'');
     // 좌→우로 갈수록 밝아진다: 문제(회색) → 해결(밝은 회색) → 성과(강조색)
-    // 세 값 모두 다크 배경 위에서 4.5:1 이상 — 배지 색이 글자색으로도 쓰이기 때문
+    // 세 값 모두 다크 배경 위에서 4.5:1 이상 · 배지 색이 글자색으로도 쓰이기 때문
     caseCol(sc,CC2,MUT,'에어브릿지 솔루션','도입한 기능·방법',c.solution||'에어브릿지 어트리뷰션 도입으로 정확한 성과 측정 체계 구축');
     caseCol(sc,CC3,ACC,'도입 후 성과','TO-BE 결과',c.result||'');
     // Arrows between columns
@@ -907,9 +976,13 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     // Migration reference bar (if any)
     const migs=MIGRATION[vm]||[];
     if(migs.length>0) {
-      const migText=`${vm} 이관 레퍼런스 ${migs.length}개사  ·  `+migs.slice(0,8).join('  ·  ')+(migs.length>8?' 외':'');
-      sc.addShape('rect',{x:0.35,y:5.13,w:9.3,h:0.24,fill:{color:CARD_C},line:{color:CARD_C,width:0}});
-      sc.addText(migText,{x:0.35,y:5.13,w:9.3,h:0.24,fontSize:9,color:DIM,fontFace:F,align:'center',valign:'middle'});
+      // 한 줄을 넘기면 한글이 글자 단위로 끊긴다 → 폭에 맞을 때까지 고객사 수를 줄인다
+      const head=`${vm} 이관 레퍼런스 ${migs.length}개사  ·  `;
+      let n=Math.min(8,migs.length), migText='';
+      do { migText=head+migs.slice(0,n).join('  ·  ')+(migs.length>n?'  외':''); n--; }
+      while(n>=1 && textW(migText,T.caption)>9.0);
+      sc.addShape('rect',{x:0.35,y:5.10,w:9.3,h:0.26,fill:{color:CARD_C},line:{color:CARD_C,width:0}});
+      sc.addText(migText,{x:0.35,y:5.10,w:9.3,h:0.26,fontSize:T.caption,color:DIM,fontFace:F,align:'center',valign:'middle'});
     }
   }
 
@@ -935,8 +1008,8 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   // ── S(6+N) 기대 효과 & ROI ──
   const s7=pptx.addSlide(); base(s7,`${nn(6+caseCount)}  기대 효과`);
   ttl(s7,`${clientName} 도입 시 기대 효과`);
-  sub(s7,cases.length?`${vertical} 버티컬 실제 도입 고객사의 검증된 성과 — 앞 슬라이드 사례 기준`
-                     :'에어브릿지 실제 고객사 데이터 기반 — 유사 버티컬 평균 성과 지표');
+  sub(s7,cases.length?`${vertical} 버티컬 실제 도입 고객사의 검증된 성과 · 앞 슬라이드 사례 기준`
+                     :'에어브릿지 실제 고객사 데이터 기반 · 유사 버티컬 평균 성과 지표');
   card(s7,CL); card(s7,CR);
   cardTitle(s7,CL,cases.length?`${vertical} 도입 고객사 실제 성과`:'검증된 성과 지표 (케이스스터디 기반)');
   cardTitle(s7,CR,'예상 ROI 시뮬레이션');
@@ -980,9 +1053,9 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   s7.addTable([rHdr,...rData],{x:CR.x+.22,y:CR.y+.88,w:CR.w-.44,colW:[2.32,1.96],rowH:.48,border:{type:'solid',color:'2D3748',pt:.5},fontFace:F,fontSize:11});
   s7.addText('예상 ROI: 투자 대비 5x ~ 15x (월 광고비 1억 기준)',{x:CR.x+.22,y:CR.y+3.02,w:CR.w-.44,h:.28,fontSize:11,bold:true,color:ACC_ON,fontFace:F});
 
-  // ── S(6+N+1) 도입 프로세스 & 가격 — 세로 타임라인 ──
+  // ── S(6+N+1) 도입 프로세스 & 가격 · 세로 타임라인 ──
   const s8=pptx.addSlide(); base(s8,`${nn(6+caseCount+1)}  도입 프로세스 & 가격`);
-  ttl(s8,'에어브릿지 도입 여정 — 계약 후 4주면 첫 데이터 확인');
+  ttl(s8,'계약 후 4주면 첫 데이터를 확인합니다');
   card(s8,CL); card(s8,CR);
   cardTitle(s8,CL,'온보딩 5단계 프로세스');
   cardTitle(s8,CR,showPrice?'예상 요금':'요금 안내');
@@ -1006,7 +1079,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     s8.addText(st.title,{x:CL.x+.68,y:cy-.18,w:CL.w-.82,h:.24,fontSize:11,bold:true,color:WHT,fontFace:F});
     s8.addText(`${st.time}  ·  ${st.desc}`,{x:CL.x+.68,y:cy+.06,w:CL.w-.82,h:.28,fontSize:9,color:MUT,fontFace:F,wrap:true});
   });
-  if(type==='이관') s8.addText('* 이관 케이스: 기존 MMP 병행 운영 약 2주 지원 — 데이터 공백 없이 전환 가능',{x:CL.x+.22,y:CL.y+CL.h-.30,w:CL.w-.44,h:.26,fontSize:9,color:ACC_ON,fontFace:F,wrap:true});
+  if(type==='이관') s8.addText('* 이관 시 기존 MMP 2주 병행 운영 지원 (데이터 공백 없음)',{x:CL.x+.22,y:CL.y+CL.h-.30,w:CL.w-.44,h:.26,fontSize:T.caption,color:ACC_ON,fontFace:F,wrap:true});
 
   // 가격 (오른쪽 카드)
   if(showPrice) {
@@ -1017,8 +1090,8 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     s8.addText('맞춤 견적 제공',{x:CR.x+.22,y:CR.y+.95,w:CR.w-.44,h:.65,fontSize:18,bold:true,color:WHT,fontFace:F});
     s8.addText('MAU 규모·도입 범위에 따라 최적화된 견적을 제안드립니다.',{x:CR.x+.22,y:CR.y+1.65,w:CR.w-.44,h:.48,fontSize:11,color:MUT,fontFace:F,wrap:true});
   }
-  ['· Fraud 방지  · Raw data  · 오디언스 매니저  · LTV 예측','· 네이버·카카오 키워드 연동  · 한국어 전담 CS','· 딥링크  · SKAdNetwork 4.0  · API 연동  · 커스텀 도메인'].forEach((ln,i)=>{
-    s8.addText(ln,{x:CR.x+.22,y:CR.y+2.20+i*.34,w:CR.w-.44,h:.30,fontSize:11,color:MUT,fontFace:F});
+  ['· Fraud 방지  · Raw data  · 오디언스 매니저','· LTV 예측  · 네이버·카카오 키워드 연동','· 한국어 전담 CS  · 딥링크  · SKAdNetwork 4.0','· API 연동  · 커스텀 도메인'].forEach((ln,i)=>{
+    s8.addText(ln,{x:CR.x+.22,y:CR.y+2.14+i*.30,w:CR.w-.44,h:.28,fontSize:T.body,color:MUT,fontFace:F});
   });
 
   // ── S(6+N+2) 다음 단계 & 문의 ──
