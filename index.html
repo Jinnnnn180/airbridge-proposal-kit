@@ -27,21 +27,24 @@
   .field-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
   label { display:block; font-size:13px; font-weight:600; color:var(--dark); margin-bottom:6px; }
   label .req { color:var(--blue); margin-left:2px; }
-  input[type=text] { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; color:var(--dark); background:var(--white); transition:border-color .15s; outline:none; }
+  /* 16px 미만이면 iOS Safari가 탭 시 화면을 강제 확대한다 */
+  input[type=text] { width:100%; min-height:44px; padding:11px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:16px; color:var(--dark); background:var(--white); transition:border-color .15s; }
   input[type=text]:focus { border-color:var(--blue); }
   input[type=text].err { border-color:var(--error); }
-  select { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; color:var(--dark); background:var(--white); outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:36px; }
+  select { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; color:var(--dark); background:var(--white); cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:36px; }
+  select { min-height:44px; font-size:16px; }
   select:focus { border-color:var(--blue); }
   select.err { border-color:var(--error); }
   .err-msg { font-size:11px; color:var(--error); margin-top:4px; display:none; }
   .err-msg.show { display:block; }
   .radio-group { display:flex; gap:8px; flex-wrap:wrap; }
   .radio-group label { cursor:pointer; }
-  .radio-btn { display:flex; align-items:center; gap:6px; padding:10px 16px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-weight:500; cursor:pointer; transition:all .15s; user-select:none; background:var(--white); }
+  .radio-btn { display:flex; align-items:center; justify-content:center; gap:6px; min-height:44px; padding:10px 16px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-weight:500; cursor:pointer; transition:all .15s; user-select:none; background:var(--white); }
   .radio-btn:hover { border-color:var(--blue-mid); background:var(--blue-light); }
   .radio-btn.active { border-color:var(--blue); background:var(--blue-light); color:var(--blue); font-weight:600; }
   .radio-btn.err { border-color:var(--error); background:#FEF2F2; }
-  .radio-btn input { display:none; }
+  .radio-btn input { position:absolute; opacity:0; width:1px; height:1px; }
+  .radio-btn:has(input:focus-visible) { outline:2px solid var(--blue); outline-offset:2px; }
   .sub-field { margin-top:16px; padding-top:16px; border-top:1px solid var(--border); display:none; }
   .sub-field.show { display:block; }
   .hint-warn { font-size:12px; color:#D97706; background:#FFFBEB; border:1px solid #FDE68A; border-radius:6px; padding:8px 12px; margin-top:8px; display:none; }
@@ -54,7 +57,7 @@
   input[type=color]::-webkit-color-swatch { border:none; border-radius:4px; }
   .color-hex { font-size:13px; font-weight:600; color:var(--dark); letter-spacing:.04em; }
   .field-hint { font-size:11px; color:var(--gray); margin-top:5px; }
-  .adv-toggle { display:flex; align-items:center; justify-content:space-between; cursor:pointer; padding:14px 20px; background:var(--white); border:1px solid var(--border); border-radius:12px; margin-bottom:24px; }
+  .adv-toggle { display:flex; width:100%; min-height:44px; align-items:center; justify-content:space-between; cursor:pointer; padding:14px 20px; background:var(--white); border:1px solid var(--border); border-radius:12px; margin-bottom:24px; font-family:inherit; }
   .adv-toggle span { font-size:13px; font-weight:600; color:var(--gray); }
   .adv-chevron { transition:transform .2s; font-size:12px; color:var(--gray); }
   .adv-toggle.open .adv-chevron { transform:rotate(180deg); }
@@ -73,23 +76,43 @@
   .btn-generate.loading .spinner { display:block; }
   @keyframes spin { to { transform:rotate(360deg); } }
   .footer-note { text-align:center; font-size:12px; color:var(--gray); margin-top:16px; }
+  /* 접근성: 대화형 요소는 button. 포커스 링·44px 터치영역 필수 */
+  :focus-visible { outline:2px solid var(--blue); outline-offset:2px; border-radius:6px; }
   .chip-group { display:flex; gap:8px; flex-wrap:wrap; }
-  .chip { padding:8px 14px; border:1.5px solid var(--border); border-radius:20px; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; user-select:none; background:var(--white); }
+  .chip { min-height:44px; padding:10px 16px; border:1.5px solid var(--border); border-radius:22px; font-size:14px; font-weight:500; font-family:inherit; color:var(--dark); cursor:pointer; transition:all .15s; user-select:none; background:var(--white); }
   .chip:hover { border-color:var(--blue-mid); background:var(--blue-light); }
-  .chip.on { border-color:var(--blue); background:var(--blue-light); color:var(--blue); font-weight:600; }
-  .chip.dim { opacity:.4; }
+  .chip[aria-pressed="true"] { border-color:var(--blue); background:var(--blue-light); color:var(--blue); font-weight:600; }
+  .chip.dim { opacity:.45; }
   .case-list { display:flex; flex-direction:column; gap:8px; }
-  .case-item { display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; transition:all .15s; }
+  .case-item { display:flex; gap:10px; align-items:flex-start; width:100%; min-height:44px; text-align:left; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; background:var(--white); font-family:inherit; cursor:pointer; transition:all .15s; }
   .case-item:hover { border-color:var(--blue-mid); }
-  .case-item.on { border-color:var(--blue); background:var(--blue-light); }
+  .case-item[aria-pressed="true"] { border-color:var(--blue); background:var(--blue-light); }
+  .case-item[aria-pressed="true"] .cbox { background:var(--blue); border-color:var(--blue); }
   .cbox { width:17px; height:17px; border:1.5px solid var(--gray); border-radius:4px; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:11px; color:white; line-height:1; }
-  .case-item.on .cbox { background:var(--blue); border-color:var(--blue); }
-  .cbody { font-size:13px; line-height:1.5; }
-  .cco { font-weight:700; }
-  .cres { color:var(--gray); font-size:12px; }
+  .cbody { display:block; font-size:13px; line-height:1.5; }
+  .cco { display:block; font-weight:700; color:var(--dark); }
+  .cres { display:block; color:var(--gray); font-size:12px; }
   .counter { font-size:11px; color:var(--gray); margin-top:6px; }
-  textarea { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-family:inherit; color:var(--dark); resize:vertical; outline:none; }
+  textarea { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-family:inherit; color:var(--dark); resize:vertical; }
+  textarea { font-size:16px; }
   textarea:focus { border-color:var(--blue); }
+
+  /* 모바일: 2단 그리드를 1단으로, 여백 축소 */
+  @media (max-width:640px) {
+    .wrap { padding:28px 16px 64px; }
+    .card { padding:20px; border-radius:12px; }
+    .field-row { grid-template-columns:1fr; gap:16px; }
+    .btn-row { flex-direction:column; }
+    .hero h1 { font-size:24px; }
+    .chip { width:100%; text-align:center; }
+    .radio-group { flex-direction:column; }
+    .radio-btn { width:100%; }
+  }
+
+  /* 모션 최소화 설정 존중 (전정기관 장애 사용자) */
+  @media (prefers-reduced-motion:reduce) {
+    *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  }
 </style>
 </head>
 <body>
@@ -103,9 +126,9 @@
   <div class="card">
     <h2>광고주 정보</h2>
     <div class="field">
-      <label>광고주명 <span class="req">*</span></label>
+      <label for="clientName">광고주명 <span class="req">*</span></label>
       <input type="text" id="clientName" placeholder="예: 00커머스" />
-      <div class="err-msg" id="e-clientName">광고주명을 입력해주세요.</div>
+      <div class="err-msg" id="e-clientName" role="alert">광고주명을 입력해주세요.</div>
     </div>
   </div>
 
@@ -113,18 +136,18 @@
     <h2>담당 AE 정보</h2>
     <div class="field-row">
       <div class="field">
-        <label>AE 이름 <span class="req">*</span></label>
+        <label for="aeName">AE 이름 <span class="req">*</span></label>
         <input type="text" id="aeName" placeholder="예: 홍길동" />
-        <div class="err-msg" id="e-aeName">AE 이름을 입력해주세요.</div>
+        <div class="err-msg" id="e-aeName" role="alert">AE 이름을 입력해주세요.</div>
       </div>
       <div class="field">
-        <label>이메일 / 연락처 <span class="req">*</span></label>
+        <label for="aeContact">이메일 / 연락처 <span class="req">*</span></label>
         <input type="text" id="aeContact" placeholder="예: hong@agency.co.kr" />
-        <div class="err-msg" id="e-aeContact">이메일 또는 연락처를 입력해주세요.</div>
+        <div class="err-msg" id="e-aeContact" role="alert">이메일 또는 연락처를 입력해주세요.</div>
       </div>
     </div>
     <div class="field">
-      <label>에이전시명</label>
+      <label for="agencyName">에이전시명</label>
       <input type="text" id="agencyName" placeholder="예: 00에이전시" />
     </div>
   </div>
@@ -132,7 +155,7 @@
   <div class="card">
     <h2>서비스 정보</h2>
     <div class="field">
-      <label>버티컬 <span class="req">*</span></label>
+      <label for="vertical">버티컬 <span class="req">*</span></label>
       <select id="vertical" onchange="onVerticalChange()">
         <option value="">선택해주세요</option>
         <option value="게임">게임</option><option value="엔터테인먼트">엔터테인먼트</option>
@@ -146,18 +169,18 @@
         <option value="부동산">부동산</option><option value="교육">교육</option>
         <option value="유틸리티">유틸리티</option><option value="기타">기타</option>
       </select>
-      <div class="err-msg" id="e-vertical">버티컬을 선택해주세요.</div>
+      <div class="err-msg" id="e-vertical" role="alert">버티컬을 선택해주세요.</div>
       <div class="hint-warn" id="hint-vertical">이 버티컬은 현재 사례 자료가 준비되지 않았습니다. 에어브릿지 주요 지표로 대체 표시됩니다.</div>
     </div>
     <div class="field">
       <label>MAU 규모 <span class="req">*</span></label>
-      <div class="radio-group" id="mauGroup">
-        <div class="radio-btn" data-val="0-5만" data-price="연 1,200만원" onclick="radioSelect(this)"><input type="radio" name="mau" value="0-5만">0 – 5만</div>
-        <div class="radio-btn" data-val="5-10만" data-price="연 1,920만원" onclick="radioSelect(this)"><input type="radio" name="mau" value="5-10만">5 – 10만</div>
-        <div class="radio-btn" data-val="10만+" data-price="별도 협의" onclick="radioSelect(this)"><input type="radio" name="mau" value="10만+">10만 이상</div>
+      <div class="radio-group" id="mauGroup" role="radiogroup" aria-label="MAU 규모">
+        <label class="radio-btn" data-val="0-5만" data-price="연 1,200만원" ><input type="radio" name="mau" value="0-5만">0 – 5만</label>
+        <label class="radio-btn" data-val="5-10만" data-price="연 1,920만원" ><input type="radio" name="mau" value="5-10만">5 – 10만</label>
+        <label class="radio-btn" data-val="10만+" data-price="별도 협의" ><input type="radio" name="mau" value="10만+">10만 이상</label>
       </div>
       <div class="price-hint" id="mauPriceHint"></div>
-      <div class="err-msg" id="e-mau">MAU 규모를 선택해주세요.</div>
+      <div class="err-msg" id="e-mau" role="alert">MAU 규모를 선택해주세요.</div>
     </div>
   </div>
 
@@ -165,13 +188,13 @@
     <h2>도입 유형</h2>
     <div class="field">
       <label>신규 도입 또는 이관 여부 <span class="req">*</span></label>
-      <div class="radio-group" id="typeGroup">
-        <div class="radio-btn" data-val="신규" onclick="radioSelect(this)"><input type="radio" name="type" value="신규">신규 도입</div>
-        <div class="radio-btn" data-val="이관" onclick="radioSelect(this)"><input type="radio" name="type" value="이관">타 MMP 이관</div>
+      <div class="radio-group" id="typeGroup" role="radiogroup" aria-label="도입 유형">
+        <label class="radio-btn" data-val="신규" ><input type="radio" name="type" value="신규">신규 도입</label>
+        <label class="radio-btn" data-val="이관" ><input type="radio" name="type" value="이관">타 MMP 이관</label>
       </div>
-      <div class="err-msg" id="e-type">도입 유형을 선택해주세요.</div>
+      <div class="err-msg" id="e-type" role="alert">도입 유형을 선택해주세요.</div>
       <div class="sub-field" id="mmpField">
-        <label>현재 사용 중인 MMP</label>
+        <label for="currentMMP">현재 사용 중인 MMP</label>
         <select id="currentMMP" onchange="onMMPChange()">
           <option value="">선택해주세요</option>
           <option value="AppsFlyer">AppsFlyer</option>
@@ -185,8 +208,8 @@
     <div class="field">
       <label>가격 정보 포함 여부</label>
       <div class="radio-group">
-        <div class="radio-btn active" data-val="yes" onclick="radioSelect(this)"><input type="radio" name="showPrice" value="yes" checked>포함</div>
-        <div class="radio-btn" data-val="no" onclick="radioSelect(this)"><input type="radio" name="showPrice" value="no">제외</div>
+        <label class="radio-btn active" data-val="yes" ><input type="radio" name="showPrice" value="yes" checked>포함</label>
+        <label class="radio-btn" data-val="no" ><input type="radio" name="showPrice" value="no">제외</label>
       </div>
       <p class="field-hint">제외 시 가격 슬라이드에서 금액이 표시되지 않습니다</p>
     </div>
@@ -205,7 +228,7 @@
       <div class="counter" id="painCounter"></div>
     </div>
     <div class="field">
-      <label>광고주가 실제로 한 말 (선택)</label>
+      <label for="clientQuote">광고주가 실제로 한 말 (선택)</label>
       <textarea id="clientQuote" rows="2" maxlength="90" placeholder="예: 매체 리포트마다 숫자가 달라서 뭘 믿어야 할지 모르겠어요"></textarea>
       <p class="field-hint">표지와 현황 진단 슬라이드에 그대로 인용됩니다 (90자 이내)</p>
     </div>
@@ -216,15 +239,15 @@
     </div>
   </div>
 
-  <div class="adv-toggle" onclick="toggleAdv(this)">
-    <span>고급 설정 (선택사항)</span><span class="adv-chevron">▾</span>
-  </div>
+  <button type="button" class="adv-toggle" onclick="toggleAdv(this)" aria-expanded="false" aria-controls="advBody">
+    <span>고급 설정 (선택사항)</span><span class="adv-chevron" aria-hidden="true">▾</span>
+  </button>
   <div class="adv-body" id="advBody">
     <div class="card">
       <h2>디자인 설정</h2>
       <div class="field-row">
         <div class="field">
-          <label>브랜드 컬러 (강조색)</label>
+          <label for="accentColor">브랜드 컬러 (강조색)</label>
           <div class="color-field">
             <input type="color" id="accentColor" value="#3B7DE9">
             <span class="color-hex" id="colorHex">#3B7DE9</span>
@@ -233,7 +256,7 @@
           <div class="hint-warn" id="hint-accent" role="alert"></div>
         </div>
         <div class="field">
-          <label>폰트</label>
+          <label for="fontSelect">폰트</label>
           <select id="fontSelect">
             <option value="Apple SD Gothic Neo">Apple SD Gothic Neo (Mac 기본)</option>
             <option value="Malgun Gothic">맑은 고딕 (Windows 기본)</option>
@@ -413,13 +436,16 @@ const selMedia = new Set();
 const selPain  = new Set();
 let   selCase  = new Set();
 
+// innerHTML을 다시 그리면 포커스가 날아간다 → 토글 후 같은 버튼으로 포커스를 되돌린다
+function refocus(id) { document.getElementById(id)?.focus(); }
+
 function renderChips() {
   document.getElementById('mediaChips').innerHTML = MEDIA_MENU
-    .map(m => `<div class="chip${selMedia.has(m.id)?' on':''}" onclick="toggleMedia('${m.id}')">${m.label}</div>`).join('');
+    .map(m => `<button type="button" id="chip-media-${m.id}" class="chip" aria-pressed="${selMedia.has(m.id)}" onclick="toggleMedia('${m.id}')">${m.label}</button>`).join('');
   document.getElementById('painChips').innerHTML = PAIN_MENU.map(p => {
     const on = selPain.has(p.id);
     const dim = !on && selPain.size >= 3;
-    return `<div class="chip${on?' on':''}${dim?' dim':''}" onclick="togglePain('${p.id}')">${p.label}</div>`;
+    return `<button type="button" id="chip-pain-${p.id}" class="chip${dim?' dim':''}" aria-pressed="${on}"${dim?' aria-disabled="true"':''} onclick="togglePain('${p.id}')">${p.label}</button>`;
   }).join('');
   document.getElementById('painCounter').textContent =
     `${selPain.size} / 3 선택 — 선택한 항목이 제안서 1번 슬라이드 맨 위와 경쟁사 비교표 상단으로 올라갑니다`;
@@ -428,12 +454,12 @@ function toggleMedia(id) {
   if(selMedia.has(id)) selMedia.delete(id); else selMedia.add(id);
   const implied = MEDIA_IMPLIES[id];
   if(implied && selMedia.has(id) && !selPain.has(implied) && selPain.size < 3) selPain.add(implied);
-  renderChips();
+  renderChips(); refocus('chip-media-'+id);
 }
 function togglePain(id) {
   if(selPain.has(id)) selPain.delete(id);
   else if(selPain.size < 3) selPain.add(id);
-  renderChips();
+  renderChips(); refocus('chip-pain-'+id);
 }
 function renderCases() {
   const v = document.getElementById('vertical').value;
@@ -444,7 +470,7 @@ function renderCases() {
   document.getElementById('caseList').innerHTML = list.map((c,i) => {
     const on = selCase.has(i);
     const head = (c.result||'').split('\n')[0];
-    return `<div class="case-item${on?' on':''}" onclick="toggleCase(${i})"><div class="cbox">${on?'✓':''}</div><div class="cbody"><div class="cco">${c.co}</div><div class="cres">${head}</div></div></div>`;
+    return `<button type="button" id="case-${i}" class="case-item" aria-pressed="${on}" onclick="toggleCase(${i})"><span class="cbox" aria-hidden="true">${on?'✓':''}</span><span class="cbody"><span class="cco">${c.co}</span><span class="cres">${head}</span></span></button>`;
   }).join('');
   document.getElementById('caseCounter').textContent = selCase.size === 0
     ? `선택하지 않으면 ${list.length}개 사례가 모두 들어갑니다. 광고주와 가장 닮은 1~3개를 고르세요.`
@@ -453,13 +479,17 @@ function renderCases() {
 function toggleCase(i) {
   if(selCase.has(i)) selCase.delete(i);
   else if(selCase.size < 3) selCase.add(i);
-  renderCases();
+  renderCases(); refocus('case-'+i);
 }
 
 // ──────────────────────────────────────────────
 // UI
 // ──────────────────────────────────────────────
-function toggleAdv(el) { el.classList.toggle('open'); document.getElementById('advBody').classList.toggle('show'); }
+function toggleAdv(el) {
+  const open = el.classList.toggle('open');
+  el.setAttribute('aria-expanded', String(open));
+  document.getElementById('advBody').classList.toggle('show', open);
+}
 function onVerticalChange() {
   const v = document.getElementById('vertical').value;
   document.getElementById('hint-vertical').classList.toggle('show', !!v && !(CASE_STUDIES[v] && CASE_STUDIES[v].length > 0));
@@ -472,6 +502,10 @@ function onMMPChange() {
   document.getElementById('hint-mmp').classList.toggle('show', document.getElementById('currentMMP').value === '기타');
 }
 
+// 네이티브 radio의 change 이벤트로 동작한다 (라벨 클릭·화살표키·스크린리더 모두 지원)
+document.querySelectorAll('.radio-btn input[type=radio]').forEach(inp => {
+  inp.addEventListener('change', () => radioSelect(inp.closest('.radio-btn')));
+});
 function radioSelect(btn) {
   const inp = btn.querySelector('input');
   if(!inp) return;
