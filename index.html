@@ -1028,7 +1028,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   const ihMap={1:2.6,2:1.30,3:.88,4:.70};
   items(s7,CL,effItems,true,{ih:ihMap[effItems.length]||.70,fs:11,tc:WHT});
 
-  s7.addText('월 광고비 1억 원 기준 시뮬레이션',{x:CR.x+.22,y:CR.y+.60,w:CR.w-.44,h:.24,fontSize:11,color:MUT,fontFace:F});
+  s7.addText('월 광고비 1억 원 기준 시뮬레이션',{x:CR.x+.22,y:CR.y+.58,w:CR.w-.44,h:.24,fontSize:T.body,color:MUT,fontFace:F});
   const rHdr=[{text:'효과 항목',options:{bold:true,color:WHT,fill:{color:ACC},fontFace:F,fontSize:11,valign:'middle'}},{text:'예상 효과',options:{bold:true,color:WHT,fill:{color:ACC},fontFace:F,fontSize:11,valign:'middle'}}];
   // 고른 고민에 대응하는 ROI 행을 먼저 넣는다
   const ROI_BY_PAIN={
@@ -1050,8 +1050,10 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
       {text:(hot?'★  ':'')+r[0],options:{color:WHT,fill:{color:bg},fontFace:F,fontSize:11,valign:'middle',bold:hot}},
       {text:r[1],options:{color:hot?ACC_ON:WHT,fill:{color:bg},fontFace:F,fontSize:11,valign:'middle',bold:hot}},
     ];});
-  s7.addTable([rHdr,...rData],{x:CR.x+.22,y:CR.y+.88,w:CR.w-.44,colW:[2.32,1.96],rowH:.48,border:{type:'solid',color:'2D3748',pt:.5},fontFace:F,fontSize:11});
-  s7.addText('예상 ROI: 투자 대비 5x ~ 15x (월 광고비 1억 기준)',{x:CR.x+.22,y:CR.y+3.02,w:CR.w-.44,h:.28,fontSize:11,bold:true,color:ACC_ON,fontFace:F});
+  // 표 끝 좌표에서 "예상 ROI" 위치를 파생시킨다 (겹침 방지). 5행 × 0.40 = 2.00in
+  const roiTblY=CR.y+.86, roiRowH=.40, roiTblBottom=roiTblY+(rData.length+1)*roiRowH;
+  s7.addTable([rHdr,...rData],{x:CR.x+.22,y:roiTblY,w:CR.w-.44,colW:[2.32,1.96],rowH:roiRowH,border:{type:'solid',color:'2D3748',pt:.5},fontFace:F,fontSize:T.body});
+  s7.addText('예상 ROI: 투자 대비 5x ~ 15x (월 광고비 1억 기준)',{x:CR.x+.22,y:roiTblBottom+.10,w:CR.w-.44,h:.26,fontSize:T.body,bold:true,color:ACC_ON,fontFace:F});
 
   // ── S(6+N+1) 도입 프로세스 & 가격 · 세로 타임라인 ──
   const s8=pptx.addSlide(); base(s8,`${nn(6+caseCount+1)}  도입 프로세스 & 가격`);
@@ -1071,9 +1073,10 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     {time:'3-5주',title:'심화 설정',desc:'SKAN 전환값 · 프로드 규칙 · 커스텀 도메인'},
     {time:'지속',title:'헬스체크',desc:'전담 CSM 배정 · 이슈 즉시 대응 · 주기 리뷰'},
   ];
-  // 각주가 들어갈 하단 영역을 먼저 떼어놓고 남은 높이를 5단계가 나눠 쓴다
-  const footBand=(type==='이관')?.34:.16;
-  const cirR=.22, cirX=CL.x+.35, startTLY=CL.y+.60, tlStep=(CL.h-.60-.20-footBand)/4;
+  // 각주가 들어갈 하단 영역을 먼저 넉넉히 떼어놓고 남은 높이를 5단계가 나눠 쓴다
+  // (이관은 각주가 있으므로 더 크게 — 5번 desc와 겹치지 않도록)
+  const footBand=(type==='이관')?.52:.20;
+  const cirR=.22, cirX=CL.x+.35, startTLY=CL.y+.62, tlStep=(CL.h-.62-.18-footBand)/4;
   tlSteps.forEach((st,i)=>{
     const cy=startTLY+i*tlStep;
     if(i<tlSteps.length-1) s8.addShape('line',{x:cirX,y:cy+cirR,w:0,h:tlStep-cirR*2,line:{color:ACC_LINE,width:1.5}});
@@ -1083,7 +1086,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     // desc는 한 줄 유지가 원칙(2줄이면 다음 단계 원과 겹침). 넘치면 wrapKo가 끊되, 현재 문구는 여유 있음.
     s8.addText(wrapKo(`${st.time}  ·  ${st.desc}`,CL.w-.82,T.caption),{x:CL.x+.68,y:cy+.06,w:CL.w-.82,h:.28,fontSize:T.caption,color:MUT,fontFace:F,wrap:true});
   });
-  if(type==='이관') s8.addText('* 이관 시 기존 MMP 2주 병행 운영 지원 (데이터 공백 없음)',{x:CL.x+.22,y:CL.y+CL.h-.30,w:CL.w-.44,h:.26,fontSize:T.caption,color:ACC_ON,fontFace:F,wrap:true});
+  if(type==='이관') s8.addText('* 이관 시 기존 MMP 2주 병행 운영 지원 (데이터 공백 없음)',{x:CL.x+.22,y:CL.y+CL.h-.26,w:CL.w-.44,h:.24,fontSize:T.caption,color:ACC_ON,fontFace:F,wrap:true});
 
   // 가격 (오른쪽 카드)
   if(showPrice) {
