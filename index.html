@@ -1056,6 +1056,9 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   // ── S(6+N+1) 도입 프로세스 & 가격 · 세로 타임라인 ──
   const s8=pptx.addSlide(); base(s8,`${nn(6+caseCount+1)}  도입 프로세스 & 가격`);
   ttl(s8,'계약 후 4주면 첫 데이터를 확인합니다');
+  // 07(기대 효과)과 동일한 리듬: 결론형 제목 → 부제 → 좌우 2단 카드
+  sub(s8,type==='이관'?'기존 MMP 병행 지원으로 데이터 공백 없이 전환하며, MAU 기반 정액 요금으로 비용이 예측 가능합니다.'
+                     :'전담 CSM이 온보딩부터 운영까지 함께하며, MAU 기반 정액 요금으로 비용이 예측 가능합니다.');
   card(s8,CL); card(s8,CR);
   cardTitle(s8,CL,'온보딩 5단계 프로세스');
   cardTitle(s8,CR,showPrice?'예상 요금':'요금 안내');
