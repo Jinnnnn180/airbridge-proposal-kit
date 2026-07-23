@@ -93,6 +93,14 @@
   .cco { display:block; font-weight:700; color:var(--dark); }
   .cres { display:block; color:var(--gray); font-size:12px; }
   .counter { font-size:11px; color:var(--gray); margin-top:6px; }
+  /* 생성 전 확인 — 무엇이 담기는지 다운로드 직전에 한 번 더 보여준다 */
+  .precheck ul { list-style:none; margin:0; padding:0; }
+  .precheck li { font-size:13px; line-height:1.6; padding:7px 0; border-bottom:1px solid var(--border); display:flex; gap:10px; }
+  .precheck li:last-child { border-bottom:none; }
+  .precheck li .k { color:var(--gray); min-width:96px; flex:none; }
+  .precheck li .v { color:var(--dark); font-weight:600; }
+  .precheck li.warn .v { color:#D97706; }
+  .precheck li.warn .v::before { content:'⚠ '; }
   textarea { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-family:inherit; color:var(--dark); resize:vertical; }
   textarea { font-size:16px; }
   textarea:focus { border-color:var(--blue); }
@@ -228,9 +236,16 @@
       <div class="counter" id="painCounter"></div>
     </div>
     <div class="field">
-      <label for="clientQuote">광고주가 실제로 한 말 (선택)</label>
+      <label for="clientQuote">광고주가 실제로 한 말 — 한 문장 (선택)</label>
       <textarea id="clientQuote" rows="2" maxlength="90" placeholder="예: 매체 리포트마다 숫자가 달라서 뭘 믿어야 할지 모르겠어요"></textarea>
-      <p class="field-hint">표지와 현황 진단 슬라이드에 그대로 인용됩니다 (90자 이내)</p>
+      <p class="field-hint">표지와 현황 진단 슬라이드에 큰따옴표로 그대로 인용됩니다 (90자 이내, 한 문장)</p>
+      <div class="hint-warn" id="hint-quote">여러 줄·목록으로 보입니다. 인용문은 <b>고객이 실제로 말한 한 문장</b>만 넣어주세요. 나머지는 아래 &lsquo;광고주가 알려준 내용&rsquo;으로 자동 이동합니다.</div>
+    </div>
+    <div class="field">
+      <label for="clientNotes">광고주가 알려준 내용 · 요청사항 (선택)</label>
+      <textarea id="clientNotes" rows="4" placeholder="한 줄에 하나씩 적어주세요&#10;예: 에어브릿지 온보딩 지원 필요&#10;예: 웹투앱 전환 측정이 가장 궁금함&#10;예: 이벤트 설계 · SDK 검증 가이드 요청"></textarea>
+      <p class="field-hint">미팅에서 들은 요청·현황을 <b>그대로</b> 적으면 &lsquo;확인된 요청 사항&rsquo; 슬라이드가 추가됩니다 (최대 6줄).</p>
+      <div class="counter" id="notesCounter"></div>
     </div>
     <div class="field" id="caseField" style="display:none">
       <label>제안서에 넣을 도입 사례 (최대 3개)</label>
@@ -255,8 +270,14 @@
         </select>
         <p class="field-hint">제안서를 여는 PC에 설치된 폰트여야 정상 표시됩니다. Pretendard 미설치 시 맑은 고딕을 선택하세요.</p>
       </div>
-      <p class="field-hint" style="margin-top:14px">색상은 에어브릿지 브랜드 팔레트(네이비 · 블루 · 그레이 · 화이트)로 고정됩니다.</p>
+      <p class="field-hint" style="margin-top:14px">색상·로고·모서리는 에어브릿지 공식 웹사이트 디자인 토큰을 그대로 사용합니다 (변경 불가).</p>
     </div>
+  </div>
+
+  <!-- 생성 전 확인 — 광고주와 사례가 어긋난 채로 다운로드되는 사고를 막는다 -->
+  <div class="card precheck" id="precheck">
+    <h2>생성 전 확인</h2>
+    <ul id="precheckList"></ul>
   </div>
 
   <div class="btn-row">
@@ -473,6 +494,73 @@ function toggleCase(i) {
 }
 
 // ──────────────────────────────────────────────
+// 광고주가 준 자유 입력 — 인용문 vs 메모 구분
+// ──────────────────────────────────────────────
+// 인용문 칸은 표지에 큰따옴표로 박히는 자리다. 여기에 미팅 메모를 통째로 붙여넣으면
+// 고객에게 "- 온보딩 지원 / - 웹투앱 장점 …" 같은 내부 메모가 그대로 나간다.
+// → 메모로 판단되면 인용은 비우고, 전부 '확인된 요청 사항' 슬라이드로 돌린다. 버리지 않는다.
+const BULLET_RE = /^[\s]*(?:[-–—•*·▪○]|\d+[.)])+\s*/;
+const QUOTE_RE  = /^["“”'']+|["“”'']+$/g;
+const lines = raw => String(raw||'').split('\n').map(s=>s.trim()).filter(Boolean);
+function looksLikeMemo(raw) {
+  const ls = lines(raw);
+  return ls.length > 1 || (ls.length === 1 && BULLET_RE.test(ls[0]));
+}
+function sanitizeQuote(raw) {
+  return (lines(raw)[0]||'').replace(BULLET_RE,'').replace(QUOTE_RE,'').trim().slice(0,90);
+}
+function parseNotes(raw) {
+  return lines(raw).map(s=>s.replace(BULLET_RE,'').replace(QUOTE_RE,'').trim()).filter(Boolean).slice(0,6);
+}
+/** 폼 입력 → 실제로 슬라이드에 들어갈 값. generate()와 미리보기가 같은 함수를 쓴다. */
+function readClientInput() {
+  const rawQ = document.getElementById('clientQuote').value.trim();
+  const rawN = document.getElementById('clientNotes').value.trim();
+  const memo = looksLikeMemo(rawQ);
+  return {
+    memo,
+    clientQuote: memo ? '' : sanitizeQuote(rawQ),
+    clientNotes: parseNotes(memo ? rawQ + '\n' + rawN : rawN),
+  };
+}
+
+// ──────────────────────────────────────────────
+// 생성 전 확인 — 다운로드 직전에 무엇이 담기는지 보여준다
+// ──────────────────────────────────────────────
+// 버티컬을 잘못 고르면 광고주와 무관한 사례가 조용히 들어간다(웹툰 광고주에 데이팅 앱 사례).
+// 자동으로 고칠 수 없는 종류의 실수라, 회사명을 눈에 보이게 띄워 사람이 잡게 한다.
+function renderPrecheck() {
+  const g = id => document.getElementById(id);
+  const box = g('precheck'); if(!box) return;
+  const v = g('vertical').value;
+  const { memo, clientQuote, clientNotes } = readClientInput();
+
+  g('hint-quote').classList.toggle('show', memo);
+  g('notesCounter').textContent = clientNotes.length
+    ? `${clientNotes.length}줄 · '확인된 요청 사항' 슬라이드가 추가됩니다`
+    : '비워두면 해당 슬라이드는 생성되지 않습니다';
+
+  const all = CASE_STUDIES[v] || [];
+  const picked = selCase.size ? [...selCase].sort((a,b)=>a-b).map(i=>all[i]) : all;
+  const slideCount = 9 + Math.max(picked.length, 1) + (clientNotes.length ? 1 : 0);
+
+  const rows = [
+    ['광고주',    g('clientName').value.trim() || '입력 전', !g('clientName').value.trim()],
+    ['버티컬',    v || '선택 전', !v],
+    ['도입 사례', picked.length
+        ? `${picked.map(c=>c.co).join(' · ')}  (${v} 사례)`
+        : (v ? `${v} 사례 없음 → 에어브릿지 지표로 대체` : '버티컬 선택 전'), !picked.length],
+    ['인용문',    memo ? '메모로 판단 → 요청 사항으로 이동됩니다'
+                       : (clientQuote || '없음 (표지 인용 생략)'), memo],
+    ['요청 사항', clientNotes.length ? `${clientNotes.length}줄 반영` : '없음', false],
+    ['분량',      `슬라이드 ${slideCount}장`, false],
+  ];
+  g('precheckList').innerHTML = rows.map(([k,val,warn]) =>
+    `<li class="${warn?'warn':''}"><span class="k">${k}</span><span class="v">${esc(val)}</span></li>`).join('');
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ──────────────────────────────────────────────
 // UI
 // ──────────────────────────────────────────────
 function toggleAdv(el) {
@@ -488,6 +576,11 @@ function onVerticalChange() {
   renderCases();
 }
 renderChips();
+// 칩·사례는 버튼 클릭이라 input/change가 뜨지 않는다 → 두 경로를 모두 건다
+document.addEventListener('input', renderPrecheck);
+document.addEventListener('change', renderPrecheck);
+document.addEventListener('click', e => { if(e.target.closest('.chip,.case-item,.radio-btn')) renderPrecheck(); });
+renderPrecheck();
 function onMMPChange() {
   document.getElementById('hint-mmp').classList.toggle('show', document.getElementById('currentMMP').value === '기타');
 }
@@ -573,7 +666,8 @@ async function generate(format) {
   const showPrice=document.querySelector('input[name="showPrice"]:checked')?.value!=='no';
   const font=document.getElementById('fontSelect').value;
   const mauPrice=mau==='0-5만'?'연 1,200만원':mau==='5-10만'?'연 1,920만원':'별도 협의';
-  const clientQuote=document.getElementById('clientQuote').value.trim();
+  // 인용문/메모 분리는 미리보기와 동일한 함수를 쓴다 (화면에 보인 것과 산출물이 어긋나지 않게)
+  const {clientQuote,clientNotes}=readClientInput();
   const media=MEDIA_MENU.filter(m=>selMedia.has(m.id));
   const pains=PAIN_MENU.filter(p=>selPain.has(p.id));
   const allCases=CASE_STUDIES[vertical]||[];
@@ -592,7 +686,7 @@ async function generate(format) {
 
   const fname = `에어브릿지_제안서_${clientName}.pptx`;
   try {
-    await buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,mauPrice,type,currentMMP,cases,migratedList,compRows,font,showPrice,outputFormat:format,fileName:fname,clientQuote,media,pains});
+    await buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,mauPrice,type,currentMMP,cases,migratedList,compRows,font,showPrice,outputFormat:format,fileName:fname,clientQuote,clientNotes,media,pains});
     clearInterval(iv); btn.classList.remove('loading'); btn.classList.add('success');
     btnText.textContent = isGS ? 'Google Slides 열기 완료! ✓' : 'PPTX 다운로드 완료! ✓';
     savePrefs();
@@ -617,23 +711,51 @@ function hasBatchim(str){
   return BATCHIM_ALPHA.has(ch);
 }
 const josaEulReul = s => hasBatchim(s) ? '을' : '를';
+const josaEga     = s => hasBatchim(s) ? '이' : '가';
+
+// ──────────────────────────────────────────────
+// 브랜드 자산 — Airbridge 워드마크
+// ──────────────────────────────────────────────
+// airbridge-website/public/logo.png (600×60, 공식 워드마크) 을 다크 배경용으로
+// 리컬러(알파 유지 + RGB→#FAFAFA)한 것. 원본 비율 10:1 을 반드시 유지한다.
+// 웹사이트 로고가 바뀌면 같은 방식으로 다시 만들어 이 상수만 교체한다.
+const AB_LOGO_LIGHT = 'data:image/png;base64,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';
+const LOGO_W = 0.86, LOGO_H = 0.086;                 // 인치 · 10:1 고정
+const logoMark = (slide, x, y) => slide.addImage({ data: AB_LOGO_LIGHT, x, y, w: LOGO_W, h: LOGO_H });
 
 // ──────────────────────────────────────────────
 // PPTX
 // ──────────────────────────────────────────────
-async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,mauPrice,type,currentMMP,cases,migratedList,compRows,font,showPrice,outputFormat,fileName,clientQuote='',media=[],pains=[]}) {
+async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,mauPrice,type,currentMMP,cases,migratedList,compRows,font,showPrice,outputFormat,fileName,clientQuote='',clientNotes=[],media=[],pains=[]}) {
   const pptx=new PptxGenJS();
   pptx.layout='LAYOUT_16x9'; pptx.title=`Airbridge 제안서 · ${clientName}`; pptx.author=agencyName||'Airbridge';
   const today=new Date();
   const dateStr=`${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
 
   // ── 1층: 원시값 (primitive) ──
-  // 팔레트는 네이비·블루·그레이·화이트 4계열로 고정. 강조색은 파랑 하나뿐이다.
+  // ⚠️ 임의 색상 금지. 아래 값은 전부 airbridge-website 의 공식 디자인 토큰
+  //    (content/design.mdx → app/globals.css 의 .dark 스코프)을 oklch→hex 변환한 것이다.
+  //    웹사이트가 토큰을 바꾸면 여기도 같이 바꾼다. 대응표:
+  //      BG     ← --background      oklch(0.145 0.005 285.823)
+  //      CARD_C ← --card            oklch(0.21  0.005 285.823)
+  //      CARD_A ← --popover         oklch(0.27  0.005 285.823)
+  //      WHT    ← --foreground      oklch(0.985 0 0)
+  //      MUT    ← --muted-foreground oklch(0.683 0.01 286)
+  //      ACC    ← --primary         oklch(0.546 0.245 262.881)
+  //    DIM·CPY 는 토큰에 없는 보조 단계라 --muted-foreground 와 배경 사이에서
+  //    WCAG AA(4.5:1)를 만족하는 값으로 잡았다. (DIM 5.78:1 / CPY 4.71:1)
   // 의미(도입 전/후, 문제/해결)는 색상이 아니라 명도로 표현한다 · 색맹 사용자도 읽을 수 있다.
-  const BG='161B2E', CARD_C='1E2438', CARD_A='243050';
-  // 다크 배경(#161B2E) 대비 4.5:1 이상을 만족하도록 밝힌 값 (WCAG AA)
-  const WHT='FFFFFF', MUT='9AA5B8', DIM='818EA9', CPY='76859B';
+  const BG='0A0A0C', CARD_C='18181B', CARD_A='262629';
+  const WHT='FAFAFA', MUT='98989F', DIM='8A8A92', CPY='7B7B82';
+  // 카드 모서리 — 웹사이트 --radius: 0.625rem(10px) = 0.104in
+  const RAD=0.104;
   const F=font;
+
+  // 슬라이드 번호 — 사례 개수·요청사항 슬라이드 유무로 뒤 번호가 통째로 밀린다.
+  // 절대 `0${n}` 로 만들지 않는다 (사례가 4개면 010 이 된다).
+  const nn=n=>String(n).padStart(2,'0');
+  const hasNotes = clientNotes.length > 0;
+  const NOFF = hasNotes ? 1 : 0;          // 요청사항 슬라이드가 끼면 이후 번호 +1
 
   // ── 타입 스케일: 6단계 고정 (덱 전체에서 이 값만 쓴다) ──
   const T = { caption:9, body:11, lead:13, stat:18, title:28, display:44 };
@@ -655,7 +777,26 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   const textW = (s, pt) => [...s].reduce((a,c)=>a+emW(c), 0) * pt / 72;   // 인치
 
   /**
-   * 폭(인치) 안에 들어가도록 어절 경계에서 줄을 나눈다.
+   * 끊어도 되는 지점(break opportunity)을 찾아 조각낸다.
+   * 1순위는 공백(어절)이지만, 한국어 마케팅 문구는 "카카오톡·인앱브라우저 완전 지원"처럼
+   * 가운뎃점·슬래시로 이어붙인 긴 덩어리가 흔하다. 공백만 보면 이 덩어리가 통째로
+   * "한 어절"이 되어 상자보다 길어지고, 결국 글자 단위로 잘려 "인앱브라 / 우저"가 된다.
+   * → 구분자(· / , →) 뒤도 끊을 수 있는 지점으로 인정한다.
+   *   조각을 다시 이어붙일 때 공백을 넣을지는 sep에 들고 다닌다 (원문 보존).
+   */
+  const BREAKABLE = /[^·\/,→]+[·\/,→]*/g;
+  function tokenize(line) {
+    const out = [];
+    line.split(' ').forEach((word, wi) => {
+      (word.match(BREAKABLE) || [word]).forEach((piece, pi) => {
+        out.push({ t: piece, sep: (wi > 0 && pi === 0) ? ' ' : '' });
+      });
+    });
+    return out;
+  }
+
+  /**
+   * 폭(인치) 안에 들어가도록 끊을 수 있는 지점에서 줄을 나눈다.
    * 탐욕적으로 채우면 마지막 어절이 혼자 넘어간다("… 광고 낭비 / 발생").
    * → 필요한 줄 수를 먼저 구하고 그 수로 균등하게 나눠 외톨이 줄을 없앤다.
    */
@@ -664,17 +805,17 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     const greedy = (toks, lim) => {
       const out = []; let cur = '';
       for (const tok of toks) {
-        const cand = cur ? cur + ' ' + tok : tok;
+        const cand = cur ? cur + tok.sep + tok.t : tok.t;
         if (textW(cand, pt) <= lim) { cur = cand; continue; }
         if (cur) out.push(cur);
-        if (textW(tok, pt) > lim) {          // 한 어절이 상자보다 길면 어쩔 수 없이 글자 단위
+        if (textW(tok.t, pt) > lim) {        // 끊을 지점이 하나도 없는 덩어리 — 그때만 글자 단위
           let piece = '';
-          for (const ch of tok) {
+          for (const ch of tok.t) {
             if (textW(piece + ch, pt) > lim) { out.push(piece); piece = ch; }
             else piece += ch;
           }
           cur = piece;
-        } else cur = tok;
+        } else cur = tok.t;
       }
       if (cur) out.push(cur);
       return out;
@@ -682,7 +823,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     return String(text).split('\n').map(line => {
       const total = textW(line, pt);
       if (total <= LIM) return line;
-      const toks = line.split(' ');
+      const toks = tokenize(line);
       const n = Math.ceil(total / LIM);                 // 최소 줄 수
       const target = Math.min(LIM, (total / n) * 1.08); // 균등 목표 폭
       let lines = greedy(toks, target);
@@ -700,15 +841,17 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
       .map(v=>Math.round(v).toString(16).padStart(2,'0')).join('').toUpperCase();
   };
 
-  // ── 2층: 역할 (semantic) ── 강조색은 브랜드 블루로 고정
-  const ACC='3B7DE9';
+  // ── 2층: 역할 (semantic) ── 강조색은 웹사이트 --primary(다크) 로 고정
+  const ACC='155DFC';
   const ACC_EDGE   = mix(ACC, BG,     0.40);  // 표지 사이드바 · 보조 카드 상단선
   const ACC_SUBTLE = mix(ACC, CARD_C, 0.20);  // 배지·미선택 원 배경
   const ACC_ROW    = mix(ACC, CARD_C, 0.15);  // 표 강조행 배경
   const ACC_LINE   = mix(ACC, BG,     0.55);  // 타임라인 연결선
   const ACC_BAR    = mix(ACC, BG,     0.55);  // 구분 바
   // 텍스트용 강조색은 배경이 아니라 흰색과 섞어 밝힌다 (어두운 배경과 섞으면 대비가 더 나빠진다)
-  const ACC_ON     = mix(WHT, ACC,    0.15);  // 다크 배경 위 강조 텍스트 · 4.5:1 확보
+  // --primary 는 웹에선 흰 글씨를 얹는 '배경색'이라 그대로 글자색으로 쓰면 카드 위에서 4.31:1 로 떨어진다.
+  // 흰색을 25% 섞어 카드 위 5.09:1 / 배경 위 5.68:1 을 확보한다.
+  const ACC_ON     = mix(WHT, ACC,    0.25);  // 다크 배경 위 강조 텍스트 · 4.5:1 확보
   const DIVIDER    = mix(MUT, BG,     0.27);  // 표지 구분선
   const HAIRLINE   = mix(WHT, CARD_C, 0.09);  // 리스트 항목 사이 얇은 선
   const NEG_HEAD   = mix(MUT, BG,     0.35);  // "문제 상황" 표 헤더 · 빨강 대신 가라앉은 회색
@@ -720,7 +863,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     slide.background={color:BG};
     slide.addShape('rect',{x:0,y:0,w:10,h:0.055,fill:{color:ACC},line:{color:ACC,width:0}});
     slide.addText(label,{x:0.35,y:0.13,w:5,h:0.22,fontSize:9,color:DIM,fontFace:F});
-    slide.addText('Airbridge',{x:8.35,y:0.09,w:1.6,h:0.3,fontSize:11,bold:true,color:WHT,fontFace:F,align:'right'});
+    logoMark(slide, 9.65-LOGO_W, 0.155);
     slide.addText('Copyright ©Airbridge 2026. All rights reserved.',{x:0.35,y:5.38,w:9.3,h:0.2,fontSize:9,color:CPY,fontFace:F});
   }
   // 제목은 반드시 한 줄. 상자를 넘치면(긴 광고주·고객사명) 넘치는 만큼만 자동 축소한다.
@@ -734,7 +877,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   function sub(slide,text) {
     slide.addText(wrapKo(text,8.0,T.body),{x:1.0,y:1.24,w:8,h:0.56,fontSize:T.body,color:MUT,fontFace:F,align:'center',wrap:true,lineSpacingMultiple:1.30});
   }
-  function card(slide,pos) { slide.addShape('rect',{x:pos.x,y:pos.y,w:pos.w,h:pos.h,fill:{color:CARD_C},line:{color:CARD_C,width:0}}); }
+  function card(slide,pos) { slide.addShape('roundRect',{x:pos.x,y:pos.y,w:pos.w,h:pos.h,rectRadius:RAD,fill:{color:CARD_C},line:{color:CARD_C,width:0}}); }
   function cardTitle(slide,pos,text) { slide.addText(text,{x:pos.x+0.22,y:pos.y+0.16,w:pos.w-0.44,h:0.34,fontSize:13,bold:true,color:ACC_ON,fontFace:F}); }
   function items(slide,pos,list,hasTitle,opts) {
     const {ih=0.72,fs=T.body,tc=WHT,dc=MUT}=opts||{};
@@ -750,18 +893,20 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     });
   }
   function miniCard(slide,pos,tag,titleTxt,desc) {
-    slide.addShape('rect',{x:pos.x,y:pos.y,w:pos.w,h:pos.h,fill:{color:CARD_C},line:{color:CARD_C,width:0}});
-    slide.addShape('rect',{x:pos.x,y:pos.y,w:0.045,h:pos.h,fill:{color:ACC},line:{color:ACC,width:0}});
+    slide.addShape('roundRect',{x:pos.x,y:pos.y,w:pos.w,h:pos.h,rectRadius:RAD,fill:{color:CARD_C},line:{color:CARD_C,width:0}});
+    // 좌측 강조바 — 라운드 코너 구간(위아래 RAD)을 피해야 카드 밖으로 삐져나오지 않는다
+    slide.addShape('rect',{x:pos.x,y:pos.y+RAD,w:0.045,h:pos.h-RAD*2,fill:{color:ACC},line:{color:ACC,width:0}});
     if(tag) slide.addText(tag,{x:pos.x+0.16,y:pos.y+0.10,w:pos.w-0.25,h:0.20,fontSize:9,bold:true,color:ACC_ON,fontFace:F});
     slide.addText(titleTxt,{x:pos.x+0.16,y:pos.y+(tag?0.30:0.18),w:pos.w-0.25,h:0.38,fontSize:13,bold:true,color:WHT,fontFace:F});
     slide.addText(desc,{x:pos.x+0.16,y:pos.y+(tag?0.68:0.58),w:pos.w-0.25,h:0.58,fontSize:11,color:MUT,fontFace:F,wrap:true});
   }
   // 3-column case card
   function caseCol(slide,pos,badgeColor,badgeTxt,heading,body) {
-    slide.addShape('rect',{x:pos.x,y:pos.y,w:pos.w,h:pos.h,fill:{color:CARD_C},line:{color:CARD_C,width:0}});
-    slide.addShape('rect',{x:pos.x,y:pos.y,w:pos.w,h:0.045,fill:{color:badgeColor},line:{color:badgeColor,width:0}});
+    slide.addShape('roundRect',{x:pos.x,y:pos.y,w:pos.w,h:pos.h,rectRadius:RAD,fill:{color:CARD_C},line:{color:CARD_C,width:0}});
+    // 상단 강조바 — 라운드 코너 구간(좌우 RAD)을 피한다
+    slide.addShape('rect',{x:pos.x+RAD,y:pos.y,w:pos.w-RAD*2,h:0.045,fill:{color:badgeColor},line:{color:badgeColor,width:0}});
     slide.addShape('rect',{x:pos.x+0.16,y:pos.y+0.10,w:pos.w-0.32,h:0.26,fill:{color:mix(badgeColor,CARD_C,0.20)},line:{color:badgeColor,width:0.6}});
-    slide.addText(badgeTxt,{x:pos.x+0.16,y:pos.y+0.10,w:pos.w-0.32,h:0.26,fontSize:9,bold:true,color:mix(WHT,badgeColor,0.15),fontFace:F,align:'center',valign:'middle'});
+    slide.addText(badgeTxt,{x:pos.x+0.16,y:pos.y+0.10,w:pos.w-0.32,h:0.26,fontSize:9,bold:true,color:mix(WHT,badgeColor,0.30),fontFace:F,align:'center',valign:'middle'});
     const cw=pos.w-0.24;   // 좁은 컬럼이라 좌우 여백을 줄여 본문 폭을 확보
     if(heading) slide.addText(heading,{x:pos.x+0.12,y:pos.y+0.46,w:cw,h:0.30,fontSize:T.body,bold:true,color:WHT,fontFace:F});
     slide.addText(wrapKo(body,cw,T.body),{x:pos.x+0.12,y:pos.y+(heading?0.82:0.48),w:cw,h:pos.h-(heading?0.96:0.62),fontSize:T.body,color:MUT,fontFace:F,wrap:true,valign:'top',lineSpacingMultiple:1.35});
@@ -772,7 +917,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   s0.background={color:BG};
   s0.addShape('rect',{x:0,y:0,w:10,h:0.055,fill:{color:ACC},line:{color:ACC,width:0}});
   s0.addShape('rect',{x:0,y:0.055,w:0.12,h:2.3,fill:{color:ACC_EDGE},line:{color:ACC_EDGE,width:0}});
-  s0.addText('Airbridge',{x:8.35,y:0.09,w:1.6,h:0.3,fontSize:11,bold:true,color:WHT,fontFace:F,align:'right'});
+  logoMark(s0, 9.65-LOGO_W, 0.155);
   s0.addText('에어브릿지\nMMP 도입 제안서',{x:0.35,y:0.90,w:8.5,h:2.20,fontSize:44,bold:true,color:WHT,fontFace:F,align:'left'});
   s0.addText(`${clientName}${josaEulReul(clientName)} 위한 맞춤 제안`,{x:0.35,y:3.22,w:7.5,h:0.44,fontSize:18,color:ACC_ON,fontFace:F,align:'left',bold:true});
   s0.addShape('rect',{x:0.35,y:3.76,w:9.3,h:0.022,fill:{color:DIVIDER},line:{color:DIVIDER,width:0}});
@@ -813,14 +958,38 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     s1.addText(wrapKo(item,P1.w-0.78,T.body),{x:P1.x+0.60,y:iy,w:P1.w-0.78,h:itemH*.84,fontSize:T.body,bold:isChosen,color:isChosen?WHT:MUT,fontFace:F,valign:'middle',wrap:true,lineSpacingMultiple:1.25});
     if(i<allPP.length-1) s1.addShape('rect',{x:P1.x+0.22,y:iy+itemH-.01,w:P1.w-0.44,h:0.01,fill:{color:HAIRLINE},line:{color:HAIRLINE,width:0}});
   });
-  s1.addShape('rect',{x:P1.x,y:P1.y+P1.h-0.52,w:P1.w,h:0.52,fill:{color:BANNER_BG},line:{color:BANNER_BG,width:0}});
+  s1.addShape('roundRect',{x:P1.x,y:P1.y+P1.h-0.52,w:P1.w,h:0.52,rectRadius:RAD,fill:{color:BANNER_BG},line:{color:BANNER_BG,width:0}});
   s1.addText(type==='이관'?'→  에어브릿지 이관으로 위 과제를 해결해 나갈 수 있습니다':'→  MMP 도입으로 위 과제를 해결해 나갈 수 있습니다',{x:P1.x+0.22,y:P1.y+P1.h-0.48,w:P1.w-0.44,h:0.42,fontSize:11,bold:true,color:ACC_ON,fontFace:F,valign:'middle'});
   s1.addNotes(chosenPP.length
     ? `발표 포인트: 상단 ${chosenPP.length}개는 광고주가 직접 말한 고민입니다. 그대로 되짚으며 "이 부분이 가장 크신 게 맞나요?"로 확인 후 대화를 엽니다.`
     : '발표 포인트: 체크리스트 하나씩 읽으며 광고주 공감 유도 → "몇 개나 해당되세요?" 질문으로 대화 오픈');
 
+  // ── S1b 확인된 요청 사항 (광고주가 준 내용이 있을 때만) ──
+  // 광고주가 직접 준 문장이라 가공하지 않고 그대로 싣는다. 우리가 해석해 바꿔 쓰면
+  // "내가 한 말이 아닌데"가 되고, 지원 범위를 단정하면 미승인 약속이 된다.
+  if (hasNotes) {
+    const sN=pptx.addSlide(); base(sN,'02  확인된 요청 사항');
+    ttl(sN,`${clientName}${josaEga(clientName)} 알려주신 내용`);
+    sub(sN,'미팅에서 확인된 요청·현황을 그대로 옮겼습니다. 아래 항목을 기준으로 도입 범위를 함께 확정합니다.');
+    const PN={x:0.35,y:1.85,w:9.3,h:3.38};
+    card(sN,PN);
+    const nH=(PN.h-0.22-0.52)/clientNotes.length;
+    clientNotes.forEach((note,i)=>{
+      const iy=PN.y+0.22+i*nH;
+      sN.addShape('ellipse',{x:PN.x+0.22,y:iy+(nH-0.26)/2,w:0.26,h:0.26,fill:{color:ACC},line:{color:ACC,width:.6}});
+      sN.addText(`${i+1}`,{x:PN.x+0.22,y:iy+(nH-0.26)/2,w:0.26,h:0.26,fontSize:9,bold:true,color:WHT,fontFace:F,align:'center',valign:'middle'});
+      sN.addText(wrapKo(note,PN.w-0.78,T.body),{x:PN.x+0.60,y:iy,w:PN.w-0.78,h:nH*.86,fontSize:T.body,color:WHT,fontFace:F,valign:'middle',wrap:true,lineSpacingMultiple:1.25});
+      if(i<clientNotes.length-1) sN.addShape('rect',{x:PN.x+0.22,y:iy+nH-.01,w:PN.w-0.44,h:0.01,fill:{color:HAIRLINE},line:{color:HAIRLINE,width:0}});
+    });
+    sN.addShape('roundRect',{x:PN.x,y:PN.y+PN.h-0.52,w:PN.w,h:0.52,rectRadius:RAD,fill:{color:BANNER_BG},line:{color:BANNER_BG,width:0}});
+    // 지원 범위를 여기서 확정하지 않는다 — 킥오프에서 함께 정한다는 사실만 남긴다
+    sN.addText('→  위 항목은 킥오프 미팅에서 전담 CSM과 함께 범위를 확정합니다',
+      {x:PN.x+0.22,y:PN.y+PN.h-0.48,w:PN.w-0.44,h:0.42,fontSize:11,bold:true,color:ACC_ON,fontFace:F,valign:'middle'});
+    sN.addNotes('발표 포인트: 광고주가 말한 문장을 그대로 읽어주며 "이렇게 이해한 게 맞나요?"로 확인합니다. 이 자리에서 지원 범위를 확답하지 말고, 킥오프에서 확정한다고 넘깁니다.');
+  }
+
   // ── S2 MMP란? · 5:5 비교 표 ──
-  const s2=pptx.addSlide(); base(s2,'02  MMP란?');
+  const s2=pptx.addSlide(); base(s2,`${nn(2+NOFF)}  MMP란?`);
   ttl(s2,'MMP가 필요한 이유');
   sub(s2,'MMP(Mobile Measurement Partner)는 모든 광고 채널의 앱 성과를 중립적으로 측정해 어떤 매체가 실제 전환에 기여했는지 파악하는 파트너입니다.');
   // 비교 표 (addTable)
@@ -845,7 +1014,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   s2.addNotes('핵심 포인트: "지금 보시는 매체 리포트 합산 숫자는 중복 기여가 섞여 있을 가능성이 높습니다."');
 
   // ── S3 에어브릿지 소개 · 2×2 그리드 ──
-  const s3=pptx.addSlide(); base(s3,'03  에어브릿지 소개');
+  const s3=pptx.addSlide(); base(s3,`${nn(3+NOFF)}  에어브릿지 소개`);
   ttl(s3,'국내 매체 연동까지 되는 유일한 MMP');
 
   // 지표 스트립 · 가장 강한 숫자를 문장에서 꺼내 크게 보여준다
@@ -887,7 +1056,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
 
   // ── S4 핵심 기능 · 2×2 그리드 ──
   // 03번과 동일한 구조 (지표 스트립 → 헤어라인 → 균등 2×2 → 캡션 푸터)
-  const s4=pptx.addSlide(); base(s4,'04  핵심 기능');
+  const s4=pptx.addSlide(); base(s4,`${nn(4+NOFF)}  핵심 기능`);
   ttl(s4,'Add-on 없이 모든 기능 기본 포함');
 
   const FEATS=[['220종','제공 로그 데이터 (타사 대비 1.5배)'],['350개+','SDK 1회 설치로 연동되는 매체'],['200개+','대시보드 메트릭']];
@@ -909,7 +1078,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
     {x:0.35,y:5.03,w:9.3,h:0.22,fontSize:T.caption,color:DIM,fontFace:F});
 
   // ── S5 경쟁사 비교 ──
-  const s5=pptx.addSlide(); base(s5,'05  경쟁사 비교');
+  const s5=pptx.addSlide(); base(s5,`${nn(5+NOFF)}  경쟁사 비교`);
   ttl(s5,compRows?`${currentMMP} 대비 에어브릿지의 강점`:'타 MMP 대비 에어브릿지의 강점');
   if(compRows) {
     // 선택한 고민과 연결된 비교 항목을 표 상단으로 끌어올린다
@@ -952,7 +1121,6 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   }
 
   // ── S6... 도입 사례 (1사례 1슬라이드) ──
-  const nn=n=>String(n).padStart(2,'0');   // 슬라이드 번호 (사례 4개면 010 → 10)
   // 3w + 2g = 9.30. 컬럼을 넓혀 어절이 혼자 넘어가는 외톨이 줄을 줄인다.
   const CC1={x:0.35,y:1.90,w:2.90,h:3.18};
   const CC2={x:3.55,y:1.90,w:2.90,h:3.18};
@@ -961,7 +1129,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
 
   function makeCaseSlide(c, idx, total, vm) {
     const sc=pptx.addSlide();
-    base(sc,`${nn(6+idx)}  도입 사례 ${idx+1}${total>1?'/'+total:''}`);
+    base(sc,`${nn(6+NOFF+idx)}  도입 사례 ${idx+1}${total>1?'/'+total:''}`);
     ttl(sc,`${c.co}  ·  도입 사례`);
     sc.addShape('rect',{x:3.55,y:1.30,w:2.9,h:0.26,fill:{color:ACC_SUBTLE},line:{color:ACC,width:0.8}});
     sc.addText(`${vm} 버티컬  ·  ${type==='이관'?`${currentMMP||'타 MMP'}에서 이관`:'신규 도입'}`,{x:3.55,y:1.30,w:2.9,h:0.26,fontSize:9,bold:true,color:ACC_ON,fontFace:F,align:'center',valign:'middle'});
@@ -1006,7 +1174,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   const caseCount=Math.max(cases.length,1);
 
   // ── S(6+N) 기대 효과 & ROI ──
-  const s7=pptx.addSlide(); base(s7,`${nn(6+caseCount)}  기대 효과`);
+  const s7=pptx.addSlide(); base(s7,`${nn(6+NOFF+caseCount)}  기대 효과`);
   ttl(s7,`${clientName} 도입 시 기대 효과`);
   sub(s7,cases.length?`${vertical} 버티컬 실제 도입 고객사의 검증된 성과 · 앞 슬라이드 사례 기준`
                      :'에어브릿지 실제 고객사 데이터 기반 · 유사 버티컬 평균 성과 지표');
@@ -1056,7 +1224,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   s7.addText('예상 ROI: 투자 대비 5x ~ 15x (월 광고비 1억 기준)',{x:CR.x+.22,y:roiTblBottom+.10,w:CR.w-.44,h:.26,fontSize:T.body,bold:true,color:ACC_ON,fontFace:F});
 
   // ── S(6+N+1) 도입 프로세스 & 가격 · 세로 타임라인 ──
-  const s8=pptx.addSlide(); base(s8,`${nn(6+caseCount+1)}  도입 프로세스 & 가격`);
+  const s8=pptx.addSlide(); base(s8,`${nn(6+NOFF+caseCount+1)}  도입 프로세스 & 가격`);
   ttl(s8,'계약 후 4주면 첫 데이터를 확인합니다');
   // 07(기대 효과)과 동일한 리듬: 결론형 제목 → 부제 → 좌우 2단 카드
   sub(s8,type==='이관'?'기존 MMP 병행 지원으로 데이터 공백 없이 전환하며, MAU 기반 정액 요금으로 비용이 예측 가능합니다.'
@@ -1105,7 +1273,7 @@ async function buildPPTX({clientName,aeName,aeContact,agencyName,vertical,mau,ma
   });
 
   // ── S(6+N+2) 다음 단계 & 문의 ──
-  const s9=pptx.addSlide(); base(s9,`${nn(6+caseCount+2)}  다음 단계 & 문의`);
+  const s9=pptx.addSlide(); base(s9,`${nn(6+NOFF+caseCount+2)}  다음 단계 & 문의`);
   ttl(s9,'지금 바로 시작하세요');
   const STEPS=[{step:'STEP 1',time:'이번 주',title:'무료 컨설팅 신청',desc:'현황 진단 · 도입 범위 파악\n비용·일정 초안 확인'},{step:'STEP 2',time:'계약 후 1-2주',title:'킥오프 & 플래닝',desc:'이벤트 플래닝 · 미디어 플래닝\n데이터 설계 · CSM 배정'},{step:'STEP 3',time:'계약 후 4주',title:'첫 데이터 확인',desc:'SDK 연동 완료\n실제 캠페인 성과 대시보드 확인 가능'}];
   STEPS.forEach((st,i)=>{
